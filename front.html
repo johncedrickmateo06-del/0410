@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ITD AOMS – Login</title>
+  <meta name="description" content="ITD Asset & Operations Monitoring System – Login">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f0ede6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 820px;
+      padding: 40px 20px;
+      gap: 40px;
+    }
+
+    /* ---- LEFT SIDE ---- */
+    .left-panel {
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .brand-logos {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .brand-logos img {
+      height: 42px;
+      width: 42px;
+      object-fit: contain;
+    }
+
+    .brand-org {
+      font-size: 11px;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .brand-itd {
+      font-size: 64px;
+      font-weight: 800;
+      color: #0d1b6e;
+      letter-spacing: -2px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .brand-system {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0d1b6e;
+      line-height: 1.35;
+    }
+
+    /* ---- RIGHT SIDE (CARD) ---- */
+    .login-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 40px 36px;
+      width: 340px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    }
+
+    .login-card h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0d1b6e;
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #4b5563;
+      margin-bottom: 6px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 13.5px;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #1f2937;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-group input:focus {
+      border-color: #0d1b6e;
+      box-shadow: 0 0 0 3px rgba(13,27,110,0.1);
+    }
+
+    .toggle-pw {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      font-size: 14px;
+      padding: 0;
+    }
+
+    .toggle-pw:hover { color: #6b7280; }
+
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .remember-row input[type="checkbox"] {
+      width: 15px;
+      height: 15px;
+      accent-color: #0d1b6e;
+      cursor: pointer;
+    }
+
+    .remember-row label {
+      font-size: 13px;
+      color: #4b5563;
+      cursor: pointer;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: #0d1b6e;
+      color: #ffffff;
+      border: none;
+      border-radius: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'Inter', Arial, sans-serif;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: background 0.15s;
+    }
+
+    .btn-login:hover {
+      background: #091259;
+    }
+
+    @media (max-width: 700px) {
+      .login-wrapper { flex-direction: column; align-items: center; }
+      .left-panel { max-width: 100%; text-align: center; }
+      .brand-logos { justify-content: center; }
+      .login-card { width: 100%; max-width: 380px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-wrapper">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="brand-logos">
+      <img src="DOE LOGO.png" alt="DOE Logo">
+      <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
+    </div>
+    <p class="brand-org">Department of Energy<br>Information Technology Division</p>
+    <div class="brand-itd">ITD</div>
+    <div class="brand-system">Asset &amp; Operations<br>Monitoring System</div>
+  </div>
+
+  <!-- LOGIN CARD -->
+  <div class="login-card">
+    <h1>Welcome</h1>
+
+    <div class="form-group">
+      <label for="email">Email address</label>
+      <input type="email" id="email" placeholder="gbalbon@doe.gov.ph" value="gbalbon@doe.gov.ph">
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <div class="input-wrap">
+        <input type="password" id="password" value="••••••••••••">
+        <button class="toggle-pw" type="button" onclick="togglePassword()" id="toggleBtn" aria-label="Toggle password visibility">
+          <i class="fa fa-eye-slash" id="eyeIcon"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="remember-row">
+      <input type="checkbox" id="remember">
+      <label for="remember">Remember me</label>
+    </div>
+
+    <div class="form-group">
+      <label for="signinRole">Sign in as</label>
+      <select id="signinRole">
+        <option>Admin</option>
+        <option>Client</option>
+        <option>Supervisor</option>
+      </select>
+    </div>
+
+    <button class="btn-login" onclick="login()">Log in</button>
+  </div>
+
+</div>
+
+<script>
+  function togglePassword() {
+    const pw = document.getElementById('password');
+    const icon = document.getElementById('eyeIcon');
+    if (pw.type === 'password') {
+      pw.type = 'text';
+      icon.className = 'fa fa-eye';
+    } else {
+      pw.type = 'password';
+      icon.className = 'fa fa-eye-slash';
+    }
+  }
+
+  function login() {
+    const role = document.getElementById('signinRole') ? document.getElementById('signinRole').value : '';
+    console.log('Signing in as', role);
+    if (role) localStorage.setItem('role', role);
+
+    if (role && role.toLowerCase() === 'client') {
+      window.location.href = 'client.html' + (role ? ('?role=' + encodeURIComponent(role)) : '');
+    } else {
+      window.location.href = 'dashboard.html' + (role ? ('?role=' + encodeURIComponent(role)) : '');
+    }
+  }
+</script>
+
+</body>
+</html>
