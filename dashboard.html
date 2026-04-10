@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – ITD AOMS</title>
+  <meta name="description" content="ITD Asset & Operations Monitoring System – Dashboard">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logos">
+          <img src="DOE LOGO.png" alt="DOE">
+          <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
+          <div style="margin-left:4px;">
+            <div class="brand-org" style="font-size:8px;color:rgba(255,255,255,0.5);line-height:1.3;">Department of
+              Energy<br>Information Technology Division</div>
+          </div>
+        </div>
+        <div class="brand-title">ITD</div>
+        <div class="brand-sub">Asset &amp; Operations<br>Monitoring System</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="active" id="nav-dashboard"><i class="fas fa-home"></i>
+          <span>Dashboard</span></a>
+
+        <!-- Services -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-tools"></i> <span>Services</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="services.html">Service Requests</a>
+            <a href="posting.html">Website Posting Logs</a>
+          </div>
+        </div>
+
+        <!-- Operations Monitoring -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="network.html">Network Monitoring</a>
+            <a href="systems.html">Systems Monitoring</a>
+            <a href="database.html">Database Monitoring</a>
+          </div>
+        </div>
+
+        <!-- Asset Management -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-boxes"></i> <span>Asset Management</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="assets.html">Hardware Assets</a>
+            <a href="softwareasset.html">Software Assets</a>
+          </div>
+        </div>
+        <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="signed-label">Signed in as</div>
+        <div class="user-name">Gerald Balbon</div>
+        <a href="front.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+        <h1 class="page-title">Dashboard</h1>
+      </div>
+
+      <!-- ROW 1: 4 Stats -->
+      <div class="stat-grid" style="grid-template-columns: repeat(4, 1fr);">
+        <div class="stat-card">
+          <div class="card-category"><i class="fas fa-tools"></i>Services</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" id="dashTotalServices">0</div>
+          <div class="card-label">Total active requests</div>
+        </div>
+        <div class="stat-card">
+          <div class="card-category"><i class="fas fa-chart-line"></i>Operations</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" style="color:#059669;">99.8%</div>
+          <div class="card-label">Monthly system uptime</div>
+        </div>
+        <div class="stat-card">
+          <div class="card-category"><i class="fas fa-server"></i>Hardware</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" id="dashTotalAssets">0</div>
+          <div class="card-label">Hardware items logged</div>
+        </div>
+        <div class="stat-card">
+          <div class="card-category"><i class="fas fa-laptop-code"></i>Software</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" id="dashTotalSoftware">0</div>
+          <div class="card-label">Software assets logged</div>
+        </div>
+      </div>
+
+      <!-- ROW 2: Services & Systems Status -->
+      <div style="display:grid;grid-template-columns: 1fr 1fr;gap:18px;margin-top:18px;">
+        <!-- Service Requests -->
+        <div class="section-block" style="margin-top:0;">
+          <div class="section-header">
+            <h2><i class="fas fa-tools" style="margin-right:8px;color:#0d1b6e;"></i>Recent Service Requests</h2>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <a href="services.html">View all &gt;</a>
+              <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Service</th>
+                <th>Description</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="recentTicketsBody">
+              <tr><td colspan="3" style="text-align:center;color:#9ca3af;padding:16px;">No recent requests found.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Systems Status -->
+        <div class="section-block collapsed" style="margin-top:0;">
+          <div class="section-header">
+            <h2><i class="fas fa-desktop" style="margin-right:8px;color:#0d1b6e;"></i>Systems Monitoring Status</h2>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <a href="systems.html">View all &gt;</a>
+              <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>System</th>
+                <th>IP</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>doe.gov.ph</strong></td>
+                <td>192.168.1.10</td>
+                <td><span class="badge badge-up">UP</span></td>
+              </tr>
+              <tr>
+                <td><strong>comsv2</strong></td>
+                <td>192.168.1.11</td>
+                <td><span class="badge badge-up">UP</span></td>
+              </tr>
+              <tr>
+                <td><strong>payroll</strong></td>
+                <td>192.168.1.12</td>
+                <td><span class="badge badge-down">DOWN</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ROW 3: Asset Inventory Summary -->
+      <div class="section-block collapsed" style="margin-top:18px;">
+        <div class="section-header">
+          <h2><i class="fas fa-boxes" style="margin-right:8px;color:#0d1b6e;"></i>Recently Logged Assets</h2>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <a href="assets.html">View all &gt;</a>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-plus"></i></button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Device Name</th>
+              <th>Type</th>
+              <th>Brand</th>
+              <th>Model</th>
+              <th>Date Acquired</th>
+            </tr>
+          </thead>
+            <tbody id="recentAssetsBody">
+              <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:16px;">No recent assets logged.</td></tr>
+            </tbody>
+        </table>
+      </div>
+
+      <!-- ROW 4: Network Logs & Web Postings -->
+      <div style="display:grid;grid-template-columns: 1fr 1fr;gap:18px;margin-top:18px;">
+        <!-- Network Logs -->
+        <div class="section-block collapsed" style="margin-top:0;">
+          <div class="section-header">
+            <h2><i class="fas fa-network-wired" style="margin-right:8px;color:#0d1b6e;"></i>Recent Network Logs</h2>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <a href="network.html">View all &gt;</a>
+              <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Incident</th>
+                <th>Action</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Unauthorized Access</td>
+                <td>IP Blocked</td>
+                <td><span class="badge badge-failed">Alert</span></td>
+              </tr>
+              <tr>
+                <td>High Latency</td>
+                <td>Router Restart</td>
+                <td><span class="badge badge-success">Resolved</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Web Postings -->
+        <div class="section-block collapsed" style="margin-top:0;">
+          <div class="section-header">
+            <h2><i class="fas fa-globe" style="margin-right:8px;color:#0d1b6e;"></i>Recent Web Postings</h2>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <a href="#">View all &gt;</a>
+              <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-plus"></i></button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Date Published</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>DOE Guidelines...</td>
+                <td>Apr 1, 2:00 PM</td>
+              </tr>
+              <tr>
+                <td>Energy Saving Tip...</td>
+                <td>Mar 30, 10:00 AM</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- User modal (embedded from user.html) -->
+  <div class="modal" id="userModal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>Create Account</h3>
+
+      <input type="text" placeholder="Full Name">
+      <input type="email" placeholder="Email">
+      <input type="password" placeholder="Password">
+
+      <input type="text" placeholder="Position (Job Title)">
+
+      <label>Gender</label>
+      <select>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+
+      <label>Role</label>
+      <select>
+        <option>Admin</option>
+        <option>Staff</option>
+      </select>
+
+      <label>Access Level</label>
+      <select>
+        <option>Read Only</option>
+        <option>Read/Write</option>
+        <option>Full Access</option>
+      </select>
+
+      <div class="modal-actions">
+        <button class="btn" onclick="closeModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function escapeHtml(s) { return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+    function updateDashboardData() {
+      // Ensure we have some default hardware logged if it's perfectly clean and unpopulated
+      if(!localStorage.getItem('hardware_assets_v1')) {
+         localStorage.setItem('hardware_assets_v1', JSON.stringify([
+           {id: 1, name: "Router-1", type: "Router", location: "HQ", vlan: "VLAN 10", floor: "1", brand: "Cisco", model: "ISR4451", serial: "R1-0001", vendor: "Procurement", date_acquired: "2023-02-15"},
+           {id: 2, name: "Switch-1", type: "Switch", location: "HQ", vlan: "VLAN 20", floor: "2", brand: "HP", model: "Aruba2930", serial: "S1-0002", vendor: "IT Store", date_acquired: "2022-11-08"},
+           {id: 4, name: "AP-1", type: "Access Point", location: "HQ", vlan: "VLAN 20", floor: "3", brand: "Ubiquiti", model: "UAP-AC", serial: "AP-0004", vendor: "Network", date_acquired: "2021-07-30"}
+         ]));
+      }
+
+      // Tickets
+      const tickets = JSON.parse(localStorage.getItem('client_tickets_v1') || '[]');
+      const activeTickets = tickets.filter(t => !['completed', 'closed'].includes((t.status || '').toLowerCase())).length;
+      document.getElementById('dashTotalServices').innerText = activeTickets;
+
+      const recentTicketsBody = document.getElementById('recentTicketsBody');
+      if (tickets.length > 0) {
+        recentTicketsBody.innerHTML = tickets.slice(-3).reverse().map(t => {
+          const stat = (t.status && t.status !== 'Open') ? t.status : 'Pending';
+          let badge = 'badge-pending';
+          if (stat.toLowerCase() === 'ongoing') badge = 'badge-ongoing';
+          if (stat.toLowerCase() === 'completed') badge = 'badge-success';
+          if (stat.toLowerCase() === 'closed') badge = 'badge-down';
+          return `<tr>
+            <td><strong>${escapeHtml(t.type || '—')}</strong></td>
+            <td>${escapeHtml(t.description || '—')}</td>
+            <td><span class="badge ${badge}">${escapeHtml(stat)}</span></td>
+          </tr>`;
+        }).join('');
+      }
+
+      // Assets
+      const hardware = JSON.parse(localStorage.getItem('hardware_assets_v1') || '[]');
+      const software = JSON.parse(localStorage.getItem('software_assets_v1') || '[]');
+      document.getElementById('dashTotalAssets').innerText = hardware.length;
+      document.getElementById('dashTotalSoftware').innerText = software.length;
+
+      const combinedAssets = [...hardware, ...software].sort((a,b) => b.id - a.id).slice(0, 3);
+      const recentAssetsBody = document.getElementById('recentAssetsBody');
+      if (combinedAssets.length > 0) {
+        recentAssetsBody.innerHTML = combinedAssets.map(a => `<tr>
+          <td><strong>${escapeHtml(a.name)}</strong></td>
+          <td>${escapeHtml(a.type)}</td>
+          <td>${escapeHtml(a.brand || a.publisher || '—')}</td>
+          <td>${escapeHtml(a.model || a.version || '—')}</td>
+          <td>${escapeHtml(a.date_acquired || a.expiry || '—')}</td>
+        </tr>`).join('');
+      }
+    }
+
+    window.onload = () => updateDashboardData();
+
+    function openModal() {
+      document.getElementById('userModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('userModal').style.display = 'none';
+    }
+
+    // RBAC: Hide User Management for non-admins
+    const userRole = localStorage.getItem('role');
+    if (userRole !== 'Admin') {
+      const navUsers = document.getElementById('nav-users');
+      if (navUsers) navUsers.style.display = 'none';
+    }
+
+    // Section Toggling – each section/card toggles independently
+    document.querySelectorAll('.section-minimize-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.section-block, .stat-card');
+        card.classList.toggle('collapsed');
+        const icon = btn.querySelector('i');
+        icon.className = card.classList.contains('collapsed') ? 'fas fa-plus' : 'fas fa-minus';
+      });
+    });
+
+    // Sidebar Dropdown Toggle (accordion – only one open at a time)
+    document.querySelectorAll('.dropdown-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.parentElement;
+        const isOpen = parent.classList.contains('open');
+        // Close ALL dropdowns first
+        document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+        // Only open the clicked one if it was previously closed
+        if (!isOpen) parent.classList.add('open');
+      });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Services Monitoring – ITD AOMS</title>
+  <meta name="description" content="ITD Asset & Operations Monitoring System – Services Monitoring">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); z-index: 1000;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: #fff; width: 550px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .modal-header {
+      padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;
+    }
+    .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #6b7280; }
+    .close-btn:hover { color: #111827; }
+    .modal-body { padding: 20px; }
+    .modal-overlay.hidden { display: none; }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logos">
+          <img src="DOE LOGO.png" alt="DOE">
+          <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
+          <div style="margin-left:4px;">
+            <div style="font-size:8px;color:rgba(255,255,255,0.5);line-height:1.3;">Department of Energy<br>Information
+              Technology Division</div>
+          </div>
+        </div>
+        <div class="brand-title">ITD</div>
+        <div class="brand-sub">Asset &amp; Operations<br>Monitoring System</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+        <!-- Services -->
+        <div class="sidebar-dropdown open">
+          <button class="dropdown-btn">
+            <i class="fas fa-tools"></i> <span>Services</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="services.html" class="active">Service Requests</a>
+            <a href="posting.html">Website Posting Logs</a>
+          </div>
+        </div>
+
+        <!-- Operations Monitoring -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="network.html">Network Monitoring</a>
+            <a href="systems.html">Systems Monitoring</a>
+            <a href="database.html">Database Monitoring</a>
+          </div>
+        </div>
+
+        <!-- Asset Management -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-boxes"></i> <span>Asset Management</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="assets.html">Hardware Assets</a>
+            <a href="softwareasset.html">Software Assets</a>
+          </div>
+        </div>
+        <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="signed-label">Signed in as</div>
+        <div class="user-name">Gerald Balbon</div>
+        <a href="front.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <h1 class="page-title">Services Monitoring</h1>
+
+      <!-- Add Service Request       <!-- Pending Requests Queue -->
+      <div class="section-block" style="margin-top:0; margin-bottom:18px;">
+        <div class="section-header">
+          <h2><i class="fas fa-inbox" style="margin-right:8px;color:#0d1b6e;"></i>Pending Client Requests</h2>
+          <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="pendingTable">
+            <thead>
+              <tr>
+                <th>Control No.</th>
+                <th>Name</th>
+                <th>Service Type</th>
+                <th>Date Submitted</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pendingBody">
+              <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">All caught up! No pending requests.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Process Service Request Modal -->
+      <div id="processRequestModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-edit"></i> Process Request #<span id="displayCtrlNo"></span></h3>
+            <button class="close-btn" onclick="cancelEdit()">&times;</button>
+          </div>
+          <div class="modal-body">
+
+        <div class="form-row" style="margin-bottom:14px;">
+          <div class="form-group">
+            <label>Client Name</label>
+            <input type="text" id="fieldName" readonly style="background:#f9fafb; color:#4b5563;">
+          </div>
+          <div class="form-group">
+            <label>Division</label>
+            <input type="text" id="fieldDivision" readonly style="background:#f9fafb; color:#4b5563;">
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <input type="text" id="fieldDept" readonly style="background:#f9fafb; color:#4b5563;">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Service Type</label>
+            <select id="serviceName" disabled style="background:#f9fafb; color:#4b5563; appearance:none;">
+              <option value="">Select type...</option>
+              <option>EMAIL</option>
+              <option>ICT INFRASTRUCTURE SYSTEMS</option>
+              <option>INFORMATION SYSTEMS AND DATABASES</option>
+              <option>NETWORK SYSTEMS</option>
+              <option>WORKSTATIONS AND PERIPHERALS </option>
+              <option>USER ACCOUNT CREATION</option>
+              <option>USER ACCOUNT MODIFICATION</option>
+              <option>USER ACCOUNT DEACTIVATION</option>
+              <option>PASSWORD RESETTING</option> 
+            </select>
+          </div>
+          <div class="form-group">
+             <label>Assigned To</label>
+             <input type="text" id="assignedTo" placeholder="Enter personnel name">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="description" readonly style="background:#f9fafb; color:#4b5563;">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <select id="status">
+              <option>Pending</option>
+              <option>Ongoing</option>
+              <option>Completed</option>
+              <option>Closed</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select id="priority">
+              <option>Low</option>
+              <option>Normal</option>
+              <option>High</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:16px;">
+          <button class="btn" id="submitBtn" onclick="transferRecord()"><i class="fas fa-check-circle"></i> Confirm</button>
+        </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket Table -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-list" style="margin-right:8px;color:#0d1b6e;"></i>Service Request Tracking</h2>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button class="btn" style="padding:6px 12px; font-size:12px; line-height:1;"><i class="fas fa-file-export"
+                style="margin-right:5px;"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div style="padding:12px 20px;display:grid;grid-template-columns: 2fr 1fr 1fr 1fr;gap:10px;border-bottom:1px solid #e5e7eb;">
+          <div style="position:relative;">
+            <input type="text" id="trackSearch" placeholder="Search by name or control no..." oninput="filterTrackedTickets()" style="width:100%; padding:8px 12px 8px 34px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:12px;"></i>
+          </div>
+          <select id="trackType" onchange="filterTrackedTickets()" style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <option value="">All Types</option>
+            <option>EMAIL</option>
+            <option>ICT INFRASTRUCTURE SYSTEMS</option>
+            <option>INFORMATION SYSTEMS AND DATABASES</option>
+            <option>NETWORK SYSTEMS</option>
+            <option>WORKSTATIONS AND PERIPHERALS</option>
+            <option>USER ACCOUNT CREATION</option>
+            <option>PASSWORD RESETTING</option>
+          </select>
+          <select id="trackStatus" onchange="filterTrackedTickets()" style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <option value="">All Statuses</option>
+            <option>Ongoing</option>
+            <option>Completed</option>
+            <option>Closed</option>
+          </select>
+          <select id="trackPriority" onchange="filterTrackedTickets()" style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <option value="">All Priorities</option>
+            <option>Low</option>
+            <option>Normal</option>
+            <option>High</option>
+          </select>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table id="ticketTable">
+            <thead>
+              <tr>
+                <th>Control No.</th>
+                <th>Name</th>
+                <th>Service</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ticketBody">
+              <tr>
+                <td colspan="7" style="text-align:center;color:#9ca3af;padding:24px;">No records yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Analytics -->
+      <div class="inner-section" style="margin-top:16px;">
+        <h2>
+          <span><i class="fas fa-chart-bar" style="margin-right:8px;color:#0d1b6e;"></i>Service Usage Analytics</span>
+          <div style="display:flex; gap:10px; float:right;">
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </h2>
+        <div id="analyticsGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;margin-top:14px;">
+        </div>
+        <p style="margin-top:14px;font-size:13px;color:#6b7280; border-top:1px dashed #e5e7eb; padding-top:12px;">Peak Ticket Activity Time: <strong id="peakTime">—</strong></p>
+      </div>
+
+
+
+    </main>
+  </div>
+
+  <script>
+    function ticketStoreKey() { return 'client_tickets_v1'; }
+    function loadTickets() {
+      try { return JSON.parse(localStorage.getItem(ticketStoreKey()) || '[]'); } catch (e) { return []; }
+    }
+    function saveTickets(t) { localStorage.setItem(ticketStoreKey(), JSON.stringify(t)); }
+
+    let editingTicketId = null;
+
+    function renderTables(list = null) {
+      const tickets = list || loadTickets();
+      const pendingBody = document.getElementById('pendingBody');
+      const trackingBody = document.getElementById('ticketBody');
+
+      // Pending: Always show actual pending, independent of tracking filter
+      const pending = (list ? loadTickets() : tickets).filter(t => !t.status || t.status.toLowerCase() === 'open' || t.status.toLowerCase() === 'pending');
+      
+      // Tracked: use the passed list (which might be filtered)
+      const tracked = tickets.filter(t => t.status && (t.status.toLowerCase() === 'ongoing' || t.status.toLowerCase() === 'completed' || t.status.toLowerCase() === 'closed'));
+
+      if (pending.length === 0) {
+        pendingBody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">All caught up! No pending requests.</td></tr>';
+      } else {
+        pendingBody.innerHTML = pending.map(t => `
+          <tr>
+            <td><strong>${t.control_no || '—'}</strong></td>
+            <td>${escapeHtml(t.name || '—')}</td>
+            <td>${escapeHtml(t.type || '—')}</td>
+            <td>${t.created ? new Date(t.created).toLocaleString() : '—'}</td>
+            <td style="text-align: center;">
+              <button onclick="viewTicket('${t.id}')" style="border:none; background:none; color:#0d1b6e; cursor:pointer; padding:4px;" title="Review & Process">
+                <i class="fas fa-share-square"></i> Review
+              </button>
+              <button onclick="deleteTicket('${t.id}')" style="border:none; background:none; color:#dc2626; cursor:pointer; padding:4px;" title="Delete Request">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `).join('');
+      }
+
+      if (tracked.length === 0) {
+        trackingBody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:24px;">No processed records yet.</td></tr>';
+      } else {
+        trackingBody.innerHTML = tracked.map(t => {
+          const statusClass = { 'pending': "badge-pending", 'ongoing': "badge-ongoing", 'completed': "badge-success", 'closed': "badge-success" }[t.status.toLowerCase()] || "";
+          const priorityColor = { 'high': "color:#991b1b;font-weight:700;", 'normal': "", 'low': "color:#065f46;" }[t.priority ? t.priority.toLowerCase() : ""] || "";
+          return `
+          <tr>
+            <td><strong>${t.control_no || '—'}</strong></td>
+            <td>${escapeHtml(t.name || '—')}</td>
+            <td>${escapeHtml(t.type || '—')}</td>
+            <td>${escapeHtml(t.assignedTo || 'Unassigned')}</td>
+            <td><span class="badge ${statusClass}">${t.status}</span></td>
+            <td style="${priorityColor}">${t.priority || 'Normal'}</td>
+            <td style="text-align: center;">
+              <button onclick="viewTicket('${t.id}')" style="border:none; background:none; color:#0d1b6e; cursor:pointer; padding:4px;" title="Edit Service">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deleteTicket('${t.id}')" style="border:none; background:none; color:#dc2626; cursor:pointer; padding:4px;" title="Delete Request">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>`;
+        }).join('');
+      }
+      
+      updateAnalytics(tickets);
+    }
+
+    function filterTrackedTickets() {
+      const searchTerm = document.getElementById('trackSearch').value.toLowerCase();
+      const typeFilter = document.getElementById('trackType').value;
+      const statusFilter = document.getElementById('trackStatus').value;
+      const priorityFilter = document.getElementById('trackPriority').value;
+
+      const allTickets = loadTickets();
+      
+      // We only filter the "TRACKED" tickets. "PENDING" remains static in its own list.
+      const filtered = allTickets.filter(t => {
+        const isTracked = t.status && (t.status.toLowerCase() === 'ongoing' || t.status.toLowerCase() === 'completed' || t.status.toLowerCase() === 'closed');
+        if (!isTracked) return false;
+
+        const matchesSearch = (t.name || '').toLowerCase().includes(searchTerm) || (t.control_no || '').toLowerCase().includes(searchTerm);
+        const matchesType = !typeFilter || t.type === typeFilter;
+        const matchesStatus = !statusFilter || t.status === statusFilter;
+        const matchesPriority = !priorityFilter || t.priority === priorityFilter;
+
+        return matchesSearch && matchesType && matchesStatus && matchesPriority;
+      });
+
+      // We need a slightly custom render for when filtered, 
+      // but to keep it simple, we'll just modify renderTables to take the tracked portion
+      const fullList = loadTickets();
+      const pendingList = fullList.filter(t => !t.status || t.status.toLowerCase() === 'open' || t.status.toLowerCase() === 'pending');
+      
+      // Combine back for renderTables logic
+      renderTables([...pendingList, ...filtered]);
+    }
+
+    function viewTicket(id) {
+      const tickets = loadTickets();
+      const t = tickets.find(x => x.id === id);
+      if (!t) return;
+      
+      editingTicketId = id;
+      
+      document.getElementById('displayCtrlNo').textContent = t.control_no || id;
+      document.getElementById('fieldName').value = t.name || '';
+      document.getElementById('fieldDivision').value = t.division || '';
+      document.getElementById('fieldDept').value = t.dept || '';
+      document.getElementById('serviceName').value = t.type || '';
+      document.getElementById('assignedTo').value = t.assignedTo || '';
+      document.getElementById('description').value = t.description || '';
+      
+      // Default to 'Ongoing' when reviewing a newly submitted or pending request
+      const statRaw = t.status.toLowerCase();
+      const stat = (statRaw === 'open' || statRaw === 'pending') ? 'Ongoing' : t.status;
+      document.getElementById('status').value = stat || 'Ongoing';
+      document.getElementById('priority').value = t.priority || 'Normal';
+      
+      document.getElementById('processRequestModal').classList.remove('hidden');
+    }
+
+    function transferRecord() {
+      if (!editingTicketId) return;
+      if (!confirm("Are you sure you want to confirm this request processing?")) return;
+      
+      const tickets = loadTickets();
+      const idx = tickets.findIndex(x => x.id === editingTicketId);
+      if (idx === -1) return;
+      
+      tickets[idx].status = document.getElementById('status').value;
+      tickets[idx].priority = document.getElementById('priority').value;
+      tickets[idx].assignedTo = document.getElementById('assignedTo').value.trim();
+      
+      saveTickets(tickets);
+      
+      cancelEdit();
+      renderTables();
+    }
+
+    function cancelEdit() {
+      editingTicketId = null;
+      document.getElementById('processRequestModal').classList.add('hidden');
+      document.getElementById('assignedTo').value = '';
+    }
+
+    function deleteTicket(id) {
+      if (!confirm("Are you sure you want to fully delete this request? This action cannot be undone.")) return;
+      let tickets = loadTickets();
+      tickets = tickets.filter(t => t.id !== id);
+      saveTickets(tickets);
+      renderTables();
+    }
+
+    function escapeHtml(s) {
+      return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    function updateAnalytics(tickets) {
+      if (!tickets) tickets = loadTickets();
+      const counts = {};
+      let hours = {};
+      
+      tickets.forEach(r => {
+        if (!r.type) return;
+        counts[r.type] = (counts[r.type] || 0) + 1;
+        
+        if (r.created) { let h = new Date(r.created).getHours(); hours[h] = (hours[h] || 0) + 1; }
+      });
+      
+      const container = document.getElementById('analyticsGrid');
+      if (container) {
+        if (Object.keys(counts).length === 0) {
+          container.innerHTML = '<div style="grid-column: 1 / -1; color:#9ca3af; text-align:center; padding:20px;">No service data available.</div>';
+        } else {
+          container.innerHTML = Object.entries(counts).map(([type, count]) => `
+            <div style="background:#f9fafb;border-radius:6px;padding:12px 16px;border:1px solid #e5e7eb; display:flex; justify-content:space-between; align-items:center;">
+              <div style="font-size:12px;font-weight:700;color:#4b5563;max-width:80%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${escapeHtml(type)}">${escapeHtml(type)}</div>
+              <div style="font-size:20px;font-weight:800;color:#0d1b6e;">${count}</div>
+            </div>
+          `).join('');
+        }
+      }
+      
+      let peak = Object.keys(hours).reduce((a, b) => hours[a] > hours[b] ? a : b, 0);
+      document.getElementById("peakTime").innerText = (hours[peak] && peak) ? peak + ":00" : "—";
+    }
+
+    window.onload = () => { renderTables(); };
+
+
+
+    // RBAC: Hide User Management for non-admins
+    const userRole = localStorage.getItem('role');
+    if (userRole !== 'Admin') {
+      const navUsers = document.getElementById('nav-users');
+      if (navUsers) navUsers.style.display = 'none';
+    }
+
+    // Section Toggling
+    document.querySelectorAll('.section-minimize-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.section-block, .inner-section');
+        card.classList.toggle('collapsed');
+        const icon = btn.querySelector('i');
+        icon.className = card.classList.contains('collapsed') ? 'fas fa-plus' : 'fas fa-minus';
+      });
+    });
+
+    // Sidebar Dropdown Toggle
+    document.querySelectorAll('.dropdown-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.parentElement;
+        const isOpen = parent.classList.contains('open');
+
+        // Close other dropdowns
+        document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+
+        // Toggle current
+        if (!isOpen) {
+          parent.classList.add('open');
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

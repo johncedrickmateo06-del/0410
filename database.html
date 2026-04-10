@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Database Monitoring – ITD AOMS</title>
+  <meta name="description" content="ITD Asset & Operations Monitoring System – Database Monitoring">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 500px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      max-height: 90vh;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .close-btn:hover {
+      color: #111827;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #111827;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logos">
+          <img src="DOE LOGO.png" alt="DOE">
+          <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
+          <div style="margin-left:4px;">
+            <div style="font-size:8px;color:rgba(255,255,255,0.5);line-height:1.3;">Department of Energy<br>Information
+              Technology Division</div>
+          </div>
+        </div>
+        <div class="brand-title">ITD</div>
+        <div class="brand-sub">Asset &amp; Operations<br>Monitoring System</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+        <!-- Services -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-tools"></i> <span>Services</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="services.html">Service Requests</a>
+            <a href="posting.html">Website Posting Logs</a>
+          </div>
+        </div>
+
+        <!-- Operations Monitoring -->
+        <div class="sidebar-dropdown open">
+          <button class="dropdown-btn">
+            <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="network.html">Network Monitoring</a>
+            <a href="systems.html">Systems Monitoring</a>
+            <a href="database.html" class="active">Database Monitoring</a>
+          </div>
+        </div>
+
+        <!-- Asset Management -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-boxes"></i> <span>Asset Management</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="assets.html">Hardware Assets</a>
+            <a href="softwareasset.html">Software Assets</a>
+          </div>
+        </div>
+        <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="signed-label">Signed in as</div>
+        <div class="user-name">Gerald Balbon</div>
+        <a href="front.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <h1 class="page-title">Database Monitoring</h1>
+
+      <!-- System Status Dashboard -->
+      <div class="inner-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h2 style="margin:0;"><i class="fas fa-server" style="margin-right:8px;color:#0d1b6e;"></i>System Status
+            Overview</h2>
+          <div id="progress-container"
+            style="width:200px; height:20px; background:#e5e7eb; border-radius:10px; overflow:hidden; position:relative;"
+            title="Whole Status Progress">
+            <div id="overall-progress-bar"
+              style="height:100%; background:linear-gradient(90deg, #10b981, #3b82f6); width:0%; transition: width 0.5s ease;">
+            </div>
+            <span id="overall-progress-text"
+              style="position:absolute; width:100%; text-align:center; font-size:10px; font-weight:700; color:#111827; line-height:20px;">0%</span>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px;">
+          <div class="stat-card">
+            <div class="stat-label">Total Systems</div>
+            <div class="stat-value" id="count-total">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Done</div>
+            <div class="stat-value" style="color:#10b981;" id="count-success">0</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">In Progress</div>
+            <div class="stat-value" style="color:#3b82f6;" id="count-ongoing">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-cloud-upload-alt" style="margin-right:8px;color:#0d1b6e;"></i>Backup Monitoring Panel
+          </h2>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="openSystemModal()"><i class="fas fa-plus"></i> Add System</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>System</th>
+                <th>Type</th>
+                <th>Last Backup</th>
+                <th>Next Backup</th>
+                <th>Status</th>
+                <th>Progress</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="systemsBody">
+              <!-- Dynamic content -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- System Management Modal -->
+      <div id="systemModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-edit"></i> <span id="modal-title">System
+                Information</span></h3>
+            <button class="close-btn" onclick="closeSystemModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="edit-id">
+            <div class="form-group">
+              <label>System Name <span style="color:red;">*</span></label>
+              <input type="text" id="sys-name" placeholder="Enter system name" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Backup Type <span style="color:red;">*</span></label>
+                <select id="sys-type">
+                  <option value="Automatic">Automatic</option>
+                  <option value="Manual">Manual</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Status</label>
+                <select id="sys-status">
+                  <option value="Done">Done</option>
+                  <option value="In Progress">In Progress</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Last Backup Date</label>
+                <input type="text" id="sys-last" readonly style="background:#f9fafb;">
+              </div>
+              <div class="form-group">
+                <label>Next Backup Date</label>
+                <input type="text" id="sys-next" readonly style="background:#f9fafb;">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Progress (%)</label>
+              <input type="range" id="sys-progress" min="0" max="100" value="0"
+                oninput="this.nextElementSibling.value = this.value + '%'">
+              <output style="font-size:12px;font-weight:700;margin-left:8px;">0%</output>
+            </div>
+            <div style="margin-top:16px;">
+              <button class="btn" onclick="saveSystem()"><i class="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+  </div>
+
+
+  </main>
+  </div>
+
+  <script>
+    const INITIAL_SYSTEMS = [
+      "Document Tracking System", "Collection Monitoring System", "Records Management System",
+      "Payment Process Monitoring System", "Enterprise Content Management System", "Payroll Data Conversion System",
+      "Electronic New Government Accounting System", "Vehicle Management System", "Petty Cash Fund Management System",
+      "Check Monitoring System", "DOE WEBSITE", "Attendance Tracking and Management System"
+    ];
+
+    function getSystems() {
+      let systems;
+      try {
+        systems = JSON.parse(localStorage.getItem('itd_systems_v1'));
+      } catch (e) { systems = null; }
+
+      if (!systems || systems.length === 0) {
+        systems = INITIAL_SYSTEMS.map((name, index) => ({
+          id: 'SYS-' + (index + 1),
+          name: name,
+          type: 'Automatic',
+          lastBackup: 'Apr 09, 2026 10:00 PM',
+          nextBackup: 'Apr 10, 2026 10:00 PM',
+          status: index % 2 === 0 ? 'Done' : 'In Progress',
+          progress: index % 2 === 0 ? 100 : 65
+        }));
+        localStorage.setItem('itd_systems_v1', JSON.stringify(systems));
+      }
+      return systems;
+    }
+
+    function renderDashboard() {
+      const systems = getSystems();
+      const total = systems.length;
+      const success = systems.filter(s => s.status === 'Done').length;
+      const ongoing = systems.filter(s => s.status === 'In Progress').length;
+      
+      const countTotalEl = document.getElementById('count-total');
+      const countSuccessEl = document.getElementById('count-success');
+      const countOngoingEl = document.getElementById('count-ongoing');
+
+      if(countTotalEl) countTotalEl.innerText = total;
+      if(countSuccessEl) countSuccessEl.innerText = success;
+      if(countOngoingEl) countOngoingEl.innerText = ongoing;
+
+      // Progress Bar: Aggregate Success % roughly
+      const overallProgress = total > 0 ? Math.round((success / total) * 100) : 0;
+      document.getElementById('overall-progress-bar').style.width = overallProgress + '%';
+      document.getElementById('overall-progress-text').innerText = overallProgress + '% Complete';
+    }
+
+    function renderSystemsTable() {
+      const systems = getSystems();
+      const body = document.getElementById('systemsBody');
+      body.innerHTML = systems.map(s => `
+    <tr>
+      <td><strong>${escapeHtml(s.name)}</strong></td>
+      <td><span class="badge" style="background:#f3f4f6; color:#374151; font-size:10px;">${escapeHtml(s.type)}</span></td>
+      <td>${escapeHtml(s.lastBackup || '—')}</td>
+      <td>${escapeHtml(s.nextBackup || '—')}</td>
+      <td><span class="badge ${getStatusBadgeClass(s.status)}">${escapeHtml(s.status)}</span></td>
+      <td>
+        <div class="progress" style="margin-top:0">
+          <div class="progress-bar" style="width:${s.progress}%; background:${s.status === 'In Progress' ? '#3b82f6' : '#10b981'}"></div>
+        </div>
+        <div style="font-size:9px; color:#6b7280; text-align:right; margin-top:2px;">${s.progress}%</div>
+      </td>
+      <td style="text-align: center;">
+        <button onclick="editSystem('${s.id}')" style="border:none; background:none; color:#0d1b6e; cursor:pointer; padding:4px;" title="Edit System">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="deleteSystem('${s.id}')" style="border:none; background:none; color:#dc2626; cursor:pointer; padding:4px;" title="Delete System">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+      renderDashboard();
+    }
+
+    function getStatusBadgeClass(status) {
+      if (status === 'Done') return 'badge-success';
+      if (status === 'In Progress') return 'badge-ongoing';
+      return '';
+    }
+
+    function escapeHtml(s) { return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+    function openSystemModal() {
+      document.getElementById('modal-title').innerText = 'Add New System';
+      document.getElementById('edit-id').value = '';
+      document.getElementById('sys-name').value = '';
+      document.getElementById('sys-type').value = 'Automatic';
+      document.getElementById('sys-status').value = 'Done';
+      
+      const now = new Date();
+      const next = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+      const opt = { month: 'short', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true };
+      
+      document.getElementById('sys-last').value = now.toLocaleString('en-US', opt).replace(',', '');
+      document.getElementById('sys-next').value = next.toLocaleString('en-US', opt).replace(',', '');
+      
+      document.getElementById('sys-progress').value = 0;
+      document.querySelector('output').value = '0%';
+      document.getElementById('systemModal').classList.remove('hidden');
+    }
+
+    function closeSystemModal() {
+      document.getElementById('systemModal').classList.add('hidden');
+    }
+
+    function editSystem(id) {
+      const systems = getSystems();
+      const s = systems.find(x => x.id === id);
+      if (!s) return;
+
+      document.getElementById('modal-title').innerText = 'Edit System Information';
+      document.getElementById('edit-id').value = s.id;
+      document.getElementById('sys-name').value = s.name;
+      document.getElementById('sys-type').value = s.type;
+      document.getElementById('sys-status').value = s.status;
+      document.getElementById('sys-last').value = s.lastBackup;
+      document.getElementById('sys-next').value = s.nextBackup;
+      document.getElementById('sys-progress').value = s.progress;
+      document.querySelector('output').value = s.progress + '%';
+      document.getElementById('systemModal').classList.remove('hidden');
+    }
+
+    function saveSystem() {
+      const name = document.getElementById('sys-name').value;
+      if (!name) { alert("Please enter system name."); return; }
+
+      const systems = getSystems();
+      const data = {
+        name: name,
+        type: document.getElementById('sys-type').value,
+        status: document.getElementById('sys-status').value,
+        lastBackup: document.getElementById('sys-last').value,
+        nextBackup: document.getElementById('sys-next').value,
+        progress: parseInt(document.getElementById('sys-progress').value)
+      };
+
+      const eid = document.getElementById('edit-id').value;
+      if (eid) {
+        const idx = systems.findIndex(x => x.id === eid);
+        if (idx !== -1) systems[idx] = { ...systems[idx], ...data };
+      } else {
+        systems.unshift({ id: 'SYS-' + Date.now(), ...data });
+      }
+
+      localStorage.setItem('itd_systems_v1', JSON.stringify(systems));
+      closeSystemModal();
+      renderSystemsTable();
+    }
+
+    function deleteSystem(id) {
+      if (!confirm("Are you sure you want to delete this system?")) return;
+      let systems = getSystems();
+      systems = systems.filter(x => x.id !== id);
+      localStorage.setItem('itd_systems_v1', JSON.stringify(systems));
+      renderSystemsTable();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderSystemsTable();
+    });
+
+    // RBAC: Hide User Management for non-admins
+    const userRole = localStorage.getItem('role');
+    if (userRole !== 'Admin') {
+      const navUsers = document.getElementById('nav-users');
+      if (navUsers) navUsers.style.display = 'none';
+    }
+
+    // Sidebar Dropdown Toggle
+    document.querySelectorAll('.dropdown-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.parentElement;
+        const isOpen = parent.classList.contains('open');
+        document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+        if (!isOpen) parent.classList.add('open');
+      });
+    });
+
+  </script>
+</body>
+
+</html>

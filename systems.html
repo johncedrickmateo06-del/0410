@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Systems Monitoring – ITD AOMS</title>
+  <meta name="description" content="ITD Asset & Operations Monitoring System – Systems Monitoring">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .uptime-table th, .uptime-table td { font-size: 12px; padding: 8px 10px; }
+    .uptime-table select { padding: 4px 6px; font-size: 12px; width: 100%; min-width: 70px; }
+    .status-up { background: #d1fae5; color: #065f46; font-weight: 600; border-radius: 4px; }
+    .status-down { background: #fee2e2; color: #991b1b; font-weight: 600; border-radius: 4px; }
+    .status-partial { background: #fef3c7; color: #92400e; font-weight: 600; border-radius: 4px; }
+    .section-block { overflow-x: auto; }
+  </style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logos">
+        <img src="DOE LOGO.png" alt="DOE">
+        <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
+        <div style="margin-left:4px;">
+          <div style="font-size:8px;color:rgba(255,255,255,0.5);line-height:1.3;">Department of Energy<br>Information Technology Division</div>
+        </div>
+      </div>
+      <div class="brand-title">ITD</div>
+      <div class="brand-sub">Asset &amp; Operations<br>Monitoring System</div>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+      
+      <!-- Services -->
+      <div class="sidebar-dropdown">
+        <button class="dropdown-btn">
+          <i class="fas fa-tools"></i> <span>Services</span>
+          <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="sidebar-submenu">
+          <a href="services.html">Service Requests</a>
+
+          <a href="posting.html">Website Posting Logs</a>
+        </div>
+      </div>
+
+      <!-- Operations Monitoring -->
+      <div class="sidebar-dropdown open">
+        <button class="dropdown-btn">
+          <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
+          <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="sidebar-submenu">
+          <a href="network.html">Network Monitoring</a>
+          <a href="systems.html" class="active">Systems Monitoring</a>
+          <a href="database.html">Database Monitoring</a>
+        </div>
+      </div>
+
+      <!-- Asset Management -->
+      <div class="sidebar-dropdown">
+        <button class="dropdown-btn">
+          <i class="fas fa-boxes"></i> <span>Asset Management</span>
+          <i class="fas fa-chevron-down chevron"></i>
+        </button>
+        <div class="sidebar-submenu">
+          <a href="assets.html">Hardware Assets</a>
+          <a href="softwareasset.html">Software Assets</a>
+        </div>
+      </div>
+      <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
+    </nav>
+    <div class="sidebar-user">
+      <div class="signed-label">Signed in as</div>
+      <div class="user-name">Gerald Balbon</div>
+      <a href="front.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main-content">
+    <h1 class="page-title">Systems Monitoring</h1>
+
+    <!-- Daily Uptime Log -->
+    <div class="section-block" style="margin-bottom:16px;">
+      <div class="section-header">
+        <h2><i class="fas fa-chart-line" style="margin-right:8px;color:#0d1b6e;"></i>Daily Uptime Log</h2>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <button class="btn btn-sm" onclick="computeUptime()"><i class="fas fa-calculator"></i> Compute</button>
+          <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="uptime-table">
+          <thead>
+            <tr>
+              <th>Date</th><th>Day</th>
+              <th>comsv2</th><th>de</th><th>depdms</th><th>doe</th>
+              <th>ertls</th><th>gea</th><th>gemp</th><th>hrips</th>
+              <th>pelp</th><th>legacy</th><th>nedr</th><th>vfelp</th>
+              <th># UP</th><th># DOWN</th><th>Uptime %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="date" id="date" style="min-width:130px;"></td>
+              <td><input type="text" id="day" placeholder="Mon" style="width:60px;"></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
+              <td id="upCount" style="font-weight:700;color:#065f46;">0</td>
+              <td id="downCount" style="font-weight:700;color:#991b1b;">0</td>
+              <td id="uptimePercent" style="font-weight:700;">0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Monthly Breakdown -->
+    <div class="section-block" style="margin-bottom:16px;">
+      <div class="section-header">
+        <h2><i class="fas fa-calendar-alt" style="margin-right:8px;color:#0d1b6e;"></i>Monthly Uptime Breakdown</h2>
+        <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="uptime-table">
+          <thead>
+            <tr>
+              <th>Month</th><th>Days Monitored</th>
+              <th>comsv2</th><th>de</th><th>depdms</th><th>doe</th><th>...</th>
+              <th>Total DOWN Days</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="month"></td>
+              <td><input type="number" placeholder="0" style="width:70px;"></td>
+              <td><input type="number" placeholder="UP days" style="width:80px;"></td>
+              <td><input type="number" style="width:60px;"></td>
+              <td><input type="number" style="width:60px;"></td>
+              <td><input type="number" style="width:60px;"></td>
+              <td style="color:#9ca3af;">...</td>
+              <td><input type="number" style="width:80px;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Status Report -->
+    <div class="section-block">
+      <div class="section-header">
+        <h2><i class="fas fa-file-alt" style="margin-right:8px;color:#0d1b6e;"></i>Monitoring Status Report</h2>
+        <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="uptime-table">
+          <thead>
+            <tr>
+              <th>Service</th><th>Uptime %</th><th>Downtime %</th>
+              <th>Uptime (hrs)</th><th>Downtime (hrs)</th>
+              <th>Uptime (min)</th><th>Downtime (min)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>doe.gov.ph</strong></td>
+              <td><input type="number" style="width:70px;"></td>
+              <td><input type="number" style="width:70px;"></td>
+              <td><input type="number" style="width:70px;"></td>
+              <td><input type="number" style="width:70px;"></td>
+              <td><input type="number" style="width:70px;"></td>
+              <td><input type="number" style="width:70px;"></td>
+            </tr>
+            <tr>
+              <td><strong>AVERAGE / TOTAL</strong></td>
+              <td colspan="6" style="color:#9ca3af;font-style:italic;">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function computeUptime() {
+  const statuses = document.querySelectorAll(".status");
+  let up = 0, down = 0;
+  statuses.forEach(s => {
+    if (s.value === "UP") up++;
+    if (s.value === "DOWN") down++;
+  });
+  const total = statuses.length;
+  const percent = ((up / total) * 100).toFixed(2);
+  document.getElementById("upCount").innerText = up;
+  document.getElementById("downCount").innerText = down;
+  document.getElementById("uptimePercent").innerText = percent + "%";
+}
+
+// RBAC: Hide User Management for non-admins
+const userRole = localStorage.getItem('role');
+if (userRole !== 'Admin') {
+  const navUsers = document.getElementById('nav-users');
+  if (navUsers) navUsers.style.display = 'none';
+}
+
+// Section Toggling (accordion for section-blocks; stat-cards are independent)
+document.querySelectorAll('.section-minimize-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const card = btn.closest('.section-block, .inner-section');
+    const isCollapsed = card.classList.contains('collapsed');
+
+    if (card.classList.contains('section-block') || card.classList.contains('inner-section')) {
+      // Accordion: collapse all other section-blocks first
+      document.querySelectorAll('.section-block, .inner-section').forEach(block => {
+        if (block !== card) {
+          block.classList.add('collapsed');
+          const otherIcon = block.querySelector('.section-minimize-btn i');
+          if (otherIcon) otherIcon.className = 'fas fa-plus';
+        }
+      });
+    }
+
+    // Toggle the clicked card
+    card.classList.toggle('collapsed');
+    const icon = btn.querySelector('i');
+    icon.className = card.classList.contains('collapsed') ? 'fas fa-plus' : 'fas fa-minus';
+  });
+});
+
+// Sidebar Dropdown Toggle (accordion – only one open at a time)
+document.querySelectorAll('.dropdown-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const parent = btn.parentElement;
+    const isOpen = parent.classList.contains('open');
+    // Close ALL dropdowns first
+    document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+    // Only open the clicked one if it was previously closed
+    if (!isOpen) parent.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>

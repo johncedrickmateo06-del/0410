@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Manager – ITD AOMS</title>
+  <meta name="description" content="ITD Asset & Operations Monitoring System – Asset Manager">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 550px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .close-btn:hover {
+      color: #111827;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .clickable-row {
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .clickable-row:hover {
+      background: #f3f4f6;
+    }
+
+    .modal-form-group {
+      margin-bottom: 12px;
+    }
+
+    .modal-form-group label {
+      display: block;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #6b7280;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .modal-form-group input,
+    .modal-form-group select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      box-sizing: border-box;
+    }
+
+    .modal-form-group input:focus,
+    .modal-form-group select:focus {
+      outline: none;
+      border-color: #0d1b6e;
+    }
+
+    .btn-save {
+      background: #0d1b6e;
+      color: #fff;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .btn-save:hover {
+      background: #0a1452;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logos">
+          <img src="DOE LOGO.png" alt="DOE">
+          <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
+          <div style="margin-left:4px;">
+            <div style="font-size:8px;color:rgba(255,255,255,0.5);line-height:1.3;">Department of Energy<br>Information
+              Technology Division</div>
+          </div>
+        </div>
+        <div class="brand-title">ITD</div>
+        <div class="brand-sub">Asset &amp; Operations<br>Monitoring System</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+        <!-- Services -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-tools"></i> <span>Services</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="services.html">Service Requests</a>
+            <a href="posting.html">Website Posting Logs</a>
+          </div>
+        </div>
+
+        <!-- Operations Monitoring -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="network.html">Network Monitoring</a>
+            <a href="systems.html">Systems Monitoring</a>
+            <a href="database.html">Database Monitoring</a>
+          </div>
+        </div>
+
+        <!-- Asset Management -->
+        <div class="sidebar-dropdown open">
+          <button class="dropdown-btn">
+            <i class="fas fa-boxes"></i> <span>Asset Management</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="assets.html" class="active">Hardware Assets</a>
+            <a href="softwareasset.html">Software Assets</a>
+          </div>
+        </div>
+        <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="signed-label">Signed in as</div>
+        <div class="user-name">Gerald Balbon</div>
+        <a href="front.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <h1 class="page-title">Asset Manager</h1>
+
+      <!-- Summary Cards -->
+      <div class="stat-grid" style="margin-bottom:16px;">
+        <div class="stat-card">
+          <div class="card-category"><i class="fas fa-sitemap"></i>Routers</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" id="routerCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="card-category"><i class="fas fa-network-wired"></i>Switches</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" id="switchCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="card-category"><i class="fas fa-wifi"></i>Access Points</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" id="apCount">0</div>
+        </div>
+        <div class="stat-card" style="background:#f4f6fc;">
+          <div class="card-category" style="color:#0d1b6e;"><i class="fas fa-boxes"></i>Total Assets</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" id="totalCount" style="color:#0d1b6e;">0</div>
+        </div>
+      </div>
+
+      <!-- Filters + Table -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-boxes" style="margin-right:8px;color:#0d1b6e;"></i>Asset Inventory</h2>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <button class="btn" style="padding:6px 12px; font-size:12px; line-height:1;" onclick="openAddModal()"><i
+                class="fas fa-plus" style="margin-right:5px;"></i> Add Asset</button>
+            <button class="btn" style="padding:6px 12px; font-size:12px; line-height:1;" onclick="generateReport()"><i
+                class="fas fa-file-export" style="margin-right:5px;"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+        <div
+          style="padding:12px 20px;display:grid;grid-template-columns:repeat(8,1fr);gap:10px;border-bottom:1px solid #e5e7eb;">
+          <select id="filterLocation" onchange="filterAssets()">
+            <option value="">All Locations</option>
+            <option>HQ</option>
+            <option>Branch</option>
+          </select>
+          <select id="filterVLAN" onchange="filterAssets()">
+            <option value="">All VLANs</option>
+            <option>VLAN 10</option>
+            <option>VLAN 20</option>
+          </select>
+          <select id="filterType" onchange="filterAssets()">
+            <option value="">All Device Types</option>
+            <option>Router</option>
+            <option>Switch</option>
+            <option>Access Point</option>
+          </select>
+          <select id="filterFloor" onchange="filterAssets()">
+            <option value="">All Floors</option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+          </select>
+          <input id="filterBrand" oninput="filterAssets()" placeholder="Brand" />
+          <input id="filterModel" oninput="filterAssets()" placeholder="Model or Serial" />
+          <input id="filterVendor" oninput="filterAssets()" placeholder="Vendor" />
+          <input id="filterDate" type="date" onchange="filterAssets()" />
+        </div>
+        <table id="assetTable">
+          <thead>
+            <tr>
+              <th>Device Name</th>
+              <th>Type</th>
+              <th>Location</th>
+              <th>VLAN</th>
+              <th>Floor</th>
+              <th>Brand</th>
+              <th>Model</th>
+              <th>Serial</th>
+              <th>Vendor</th>
+              <th>Date Acquired</th>
+              <th style="width: 80px; text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="assetBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Edit Asset Modal -->
+      <div id="editAssetModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 id="modalTitle" style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-edit"></i> Edit Asset
+              Details</h3>
+            <button class="close-btn" onclick="closeEditModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+              <input type="hidden" id="editAssetId">
+              <div class="modal-form-group" style="grid-column: 1 / -1;">
+                <label>Device Name</label>
+                <input type="text" id="editName">
+              </div>
+              <div class="modal-form-group">
+                <label>Type</label>
+                <select id="editType">
+                  <option>Router</option>
+                  <option>Switch</option>
+                  <option>Access Point</option>
+                </select>
+              </div>
+              <div class="modal-form-group">
+                <label>Location</label>
+                <select id="editLocation">
+                  <option>HQ</option>
+                  <option>Branch</option>
+                </select>
+              </div>
+              <div class="modal-form-group">
+                <label>VLAN</label>
+                <input type="text" id="editVLAN">
+              </div>
+              <div class="modal-form-group">
+                <label>Floor</label>
+                <input type="text" id="editFloor">
+              </div>
+              <div class="modal-form-group">
+                <label>Brand</label>
+                <input type="text" id="editBrand">
+              </div>
+              <div class="modal-form-group">
+                <label>Model</label>
+                <input type="text" id="editModel">
+              </div>
+              <div class="modal-form-group">
+                <label>Serial</label>
+                <input type="text" id="editSerial">
+              </div>
+              <div class="modal-form-group">
+                <label>Vendor</label>
+                <input type="text" id="editVendor">
+              </div>
+              <div class="modal-form-group" style="grid-column: 1 / -1;">
+                <label>Date Acquired</label>
+                <input type="date" id="editDate">
+              </div>
+            </div>
+            <button class="btn-save" onclick="saveAssetEdit()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    let assets = JSON.parse(localStorage.getItem('hardware_assets_v1') || 'null');
+    if (!assets) {
+      assets = [
+        { id: 1, name: "Router-1", type: "Router", location: "HQ", vlan: "VLAN 10", floor: "1", brand: "Cisco", model: "ISR4451", serial: "R1-0001", vendor: "Procurement", date_acquired: "2023-02-15" },
+        { id: 2, name: "Switch-1", type: "Switch", location: "HQ", vlan: "VLAN 20", floor: "2", brand: "HP", model: "Aruba2930", serial: "S1-0002", vendor: "IT Store", date_acquired: "2022-11-08" },
+        { id: 4, name: "AP-1", type: "Access Point", location: "HQ", vlan: "VLAN 20", floor: "3", brand: "Ubiquiti", model: "UAP-AC", serial: "AP-0004", vendor: "Network", date_acquired: "2021-07-30" },
+        { id: 5, name: "Switch-2", type: "Switch", location: "Branch", vlan: "VLAN 10", floor: "2", brand: "Cisco", model: "Catalyst2960", serial: "S2-0005", vendor: "IT Store", date_acquired: "2020-05-12" }
+      ];
+      localStorage.setItem('hardware_assets_v1', JSON.stringify(assets));
+    }
+
+    function renderTable(data) {
+      const body = document.getElementById("assetBody");
+      if (!data.length) {
+        body.innerHTML = '<tr><td colspan="11" style="text-align:center;color:#9ca3af;padding:24px;">No assets match the selected filters.</td></tr>';
+      } else {
+        body.innerHTML = data.map(a => `
+      <tr class="clickable-row" onclick="openEditModal(${a.id})" title="Click to view and edit details">
+        <td><strong>${a.name}</strong></td>
+        <td>${a.type}</td>
+        <td>${a.location || '—'}</td>
+        <td>${a.vlan || '—'}</td>
+        <td>${a.floor || '—'}</td>
+        <td>${a.brand || '—'}</td>
+        <td>${a.model || '—'}</td>
+        <td>${a.serial || '—'}</td>
+        <td>${a.vendor || '—'}</td>
+        <td>${a.date_acquired || '—'}</td>
+        <td style="text-align: center;">
+          <button onclick="openEditModal(${a.id}); event.stopPropagation();" style="border:none; background:none; color:#0d1b6e; cursor:pointer; padding:4px;" title="Edit Asset">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button onclick="deleteAsset(${a.id}); event.stopPropagation();" style="border:none; background:none; color:#dc2626; cursor:pointer; padding:4px;" title="Delete Asset">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join("");
+      }
+      updateCounts(data);
+    }
+
+    let isEditing = false;
+
+    function openAddModal() {
+      isEditing = false;
+      document.getElementById('editAssetId').value = '';
+      document.getElementById('editName').value = '';
+      document.getElementById('editType').value = 'Router';
+      document.getElementById('editLocation').value = 'HQ';
+      document.getElementById('editVLAN').value = '';
+      document.getElementById('editFloor').value = '';
+      document.getElementById('editBrand').value = '';
+      document.getElementById('editModel').value = '';
+      document.getElementById('editSerial').value = '';
+      document.getElementById('editVendor').value = '';
+      document.getElementById('editDate').value = '';
+
+      document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add New Asset';
+      document.getElementById('editAssetModal').classList.remove('hidden');
+    }
+
+    function openEditModal(id) {
+      isEditing = true;
+      const asset = assets.find(a => a.id === id);
+      if (!asset) return;
+
+      document.getElementById('editAssetId').value = asset.id;
+      document.getElementById('editName').value = asset.name || '';
+      document.getElementById('editType').value = asset.type || 'Router';
+      document.getElementById('editLocation').value = asset.location || 'HQ';
+      document.getElementById('editVLAN').value = asset.vlan || '';
+      document.getElementById('editFloor').value = asset.floor || '';
+      document.getElementById('editBrand').value = asset.brand || '';
+      document.getElementById('editModel').value = asset.model || '';
+      document.getElementById('editSerial').value = asset.serial || '';
+      document.getElementById('editVendor').value = asset.vendor || '';
+      document.getElementById('editDate').value = asset.date_acquired || '';
+
+      document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Asset Details';
+      document.getElementById('editAssetModal').classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editAssetModal').classList.add('hidden');
+    }
+
+    function generateReport() {
+      if (confirm("Are you sure you want to generate a report for the current inventory?")) {
+        alert("Report generated successfully!");
+      }
+    }
+
+    function saveAssetEdit() {
+      if (!confirm("Are you sure you want to save this asset?")) return;
+
+      if (isEditing) {
+        const id = parseInt(document.getElementById('editAssetId').value);
+        const assetIndex = assets.findIndex(a => a.id === id);
+        if (assetIndex === -1) return;
+
+        assets[assetIndex].name = document.getElementById('editName').value;
+        assets[assetIndex].type = document.getElementById('editType').value;
+        assets[assetIndex].location = document.getElementById('editLocation').value;
+        assets[assetIndex].vlan = document.getElementById('editVLAN').value;
+        assets[assetIndex].floor = document.getElementById('editFloor').value;
+        assets[assetIndex].brand = document.getElementById('editBrand').value;
+        assets[assetIndex].model = document.getElementById('editModel').value;
+        assets[assetIndex].serial = document.getElementById('editSerial').value;
+        assets[assetIndex].vendor = document.getElementById('editVendor').value;
+        assets[assetIndex].date_acquired = document.getElementById('editDate').value;
+      } else {
+        const newId = assets.length ? Math.max(...assets.map(a => a.id)) + 1 : 1;
+        assets.unshift({
+          id: newId,
+          name: document.getElementById('editName').value,
+          type: document.getElementById('editType').value,
+          location: document.getElementById('editLocation').value,
+          vlan: document.getElementById('editVLAN').value,
+          floor: document.getElementById('editFloor').value,
+          brand: document.getElementById('editBrand').value,
+          model: document.getElementById('editModel').value,
+          serial: document.getElementById('editSerial').value,
+          vendor: document.getElementById('editVendor').value,
+          date_acquired: document.getElementById('editDate').value
+        });
+      }
+
+      localStorage.setItem('hardware_assets_v1', JSON.stringify(assets));
+      closeEditModal();
+      filterAssets(); // Re-render table taking ongoing filters into account
+    }
+
+    function deleteAsset(id) {
+      if (!confirm("Are you sure you want to delete this asset? This action cannot be undone.")) return;
+      assets = assets.filter(a => a.id !== id);
+      localStorage.setItem('hardware_assets_v1', JSON.stringify(assets));
+      filterAssets();
+    }
+
+    function updateCounts(data) {
+      document.getElementById("routerCount").innerText = data.filter(a => a.type === "Router").length;
+      document.getElementById("switchCount").innerText = data.filter(a => a.type === "Switch").length;
+      document.getElementById("apCount").innerText = data.filter(a => a.type === "Access Point").length;
+      document.getElementById("totalCount").innerText = data.length;
+    }
+
+    function filterAssets() {
+      const loc = document.getElementById("filterLocation").value;
+      const vlan = document.getElementById("filterVLAN").value;
+      const type = document.getElementById("filterType").value;
+      const floor = document.getElementById("filterFloor").value;
+      const brand = document.getElementById("filterBrand").value.trim().toLowerCase();
+      const model = document.getElementById("filterModel").value.trim().toLowerCase();
+      const vendor = document.getElementById("filterVendor").value.trim().toLowerCase();
+      const dateSelected = document.getElementById("filterDate").value;
+      const filtered = assets.filter(a =>
+        (loc === "" || a.location === loc) &&
+        (vlan === "" || a.vlan === vlan) &&
+        (type === "" || a.type === type)
+        && (floor === "" || (a.floor && a.floor === floor))
+        && (brand === "" || (a.brand && a.brand.toLowerCase().includes(brand)))
+        && (model === "" || ((a.model && a.model.toLowerCase().includes(model)) || (a.serial && a.serial.toLowerCase().includes(model))))
+        && (vendor === "" || (a.vendor && a.vendor.toLowerCase().includes(vendor)))
+        && (dateSelected === "" || (() => {
+          if (!a.date_acquired) return false;
+          const d = new Date(a.date_acquired);
+          const sel = new Date(dateSelected);
+          // compare by day: create start/end bounds for selected day
+          const start = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate(), 0, 0, 0, 0);
+          const end = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate(), 23, 59, 59, 999);
+          return d >= start && d <= end;
+        })())
+      );
+      renderTable(filtered);
+    }
+
+    renderTable(assets);
+
+    // RBAC: Hide User Management for non-admins
+    const userRole = localStorage.getItem('role');
+    if (userRole !== 'Admin') {
+      const navUsers = document.getElementById('nav-users');
+      if (navUsers) navUsers.style.display = 'none';
+    }
+
+    // Section Toggling (accordion for section-blocks; stat-cards are independent)
+    document.querySelectorAll('.section-minimize-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.section-block, .stat-card');
+        const isCollapsed = card.classList.contains('collapsed');
+
+        if (card.classList.contains('section-block')) {
+          // Accordion: collapse all other section-blocks first
+          document.querySelectorAll('.section-block').forEach(block => {
+            if (block !== card) {
+              block.classList.add('collapsed');
+              const otherIcon = block.querySelector('.section-minimize-btn i');
+              if (otherIcon) otherIcon.className = 'fas fa-plus';
+            }
+          });
+        }
+
+        // Toggle the clicked card
+        card.classList.toggle('collapsed');
+        const icon = btn.querySelector('i');
+        icon.className = card.classList.contains('collapsed') ? 'fas fa-plus' : 'fas fa-minus';
+      });
+    });
+
+    // Sidebar Dropdown Toggle (accordion – only one open at a time)
+    document.querySelectorAll('.dropdown-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.parentElement;
+        const isOpen = parent.classList.contains('open');
+        // Close ALL dropdowns first
+        document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+        // Only open the clicked one if it was previously closed
+        if (!isOpen) parent.classList.add('open');
+      });
+    });
+  </script>
+</body>
+
+</html>

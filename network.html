@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Monitoring – ITD AOMS</title>
+  <meta name="description" content="ITD Asset & Operations Monitoring System – Network Monitoring">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 600px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      max-height: 90vh;
+    }
+
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .close-btn:hover {
+      color: #111827;
+    }
+
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logos">
+          <img src="DOE LOGO.png" alt="DOE">
+          <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
+          <div style="margin-left:4px;">
+            <div style="font-size:8px;color:rgba(255,255,255,0.5);line-height:1.3;">Department of Energy<br>Information
+              Technology Division</div>
+          </div>
+        </div>
+        <div class="brand-title">ITD</div>
+        <div class="brand-sub">Asset &amp; Operations<br>Monitoring System</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+        <!-- Services -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-tools"></i> <span>Services</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="services.html">Service Requests</a>
+            <a href="posting.html">Website Posting Logs</a>
+          </div>
+        </div>
+
+        <!-- Operations Monitoring -->
+        <div class="sidebar-dropdown open">
+          <button class="dropdown-btn">
+            <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="network.html" class="active">Network Monitoring</a>
+            <a href="systems.html">Systems Monitoring</a>
+            <a href="database.html">Database Monitoring</a>
+          </div>
+        </div>
+
+        <!-- Asset Management -->
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-boxes"></i> <span>Asset Management</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="assets.html">Hardware Assets</a>
+            <a href="softwareasset.html">Software Assets</a>
+          </div>
+        </div>
+        <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="signed-label">Signed in as</div>
+        <div class="user-name">Gerald Balbon</div>
+        <a href="front.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <h1 class="page-title">Network Monitoring</h1>
+
+      <!-- Firewall Logs Table Display -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-shield-alt" style="margin-right:8px;color:#0d1b6e;"></i>Actioned Firewall Logs</h2>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="openFirewallModal()"><i class="fas fa-plus"></i> Add Log</button>
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="exportToCSV('firewall')"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="firewallTable">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Incident No.</th>
+                <th>Incident</th>
+                <th>Country</th>
+                <th>Action Taken</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="firewallBody">
+              <tr>
+                <td colspan="6" style="text-align:center;color:#9ca3af;padding:24px;">No firewall logs recorded yet.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Firewall Modal Form -->
+      <div id="firewallModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-plus"></i> Log Firewall Action
+              (Incident/Alert)</h3>
+            <button class="close-btn" onclick="closeFirewallModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="fw-edit-id">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Date <span style="color:red;">*</span></label>
+                <input type="date" id="fw-date" required>
+              </div>
+              <div class="form-group">
+                <label>Time <span style="color:red;">*</span></label>
+                <input type="time" id="fw-time" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Incident/Alert <span style="color:red;">*</span></label>
+              <input type="text" placeholder="Describe the incident" id="fw-incident" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Incident No.</label>
+                <input type="text" id="fw-number" readonly style="background:#f3f4f6;">
+              </div>
+              <div class="form-group">
+                <label>Country <span style="color:red;">*</span></label>
+                <input type="text" placeholder="Country of origin" id="fw-country" required>
+              </div>
+              <div class="form-group">
+                <label>Reputation checked <span style="color:red;">*</span></label>
+                <select id="fw-reputation">
+                  <option value="VirusTotal">VirusTotal</option>
+                  <option value="AbuseIPDB">AbuseIPDB</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Abuse level <span style="color:red;">*</span></label>
+                <select id="fw-abuse">
+                  <option value="High">High</option>
+                  <option value="Medium">Medium</option>
+                  <option value="Low">Low</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Action Taken <span style="color:red;">*</span></label>
+                <input type="text" placeholder="What action was performed" id="fw-action" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Remarks</label>
+              <input type="text" placeholder="Additional remarks" id="fw-remarks">
+            </div>
+            <div class="form-group">
+              <label>Attachments (Up to 2 files) <span style="color:red;">*</span></label>
+              <input type="file" id="fw-images" accept="image/*" multiple>
+              <small style="color:#6b7280; display:block; margin-top:4px;">
+                - High: at least 1 image<br>
+                - Medium/Low: 2 images
+              </small>
+            </div>
+            <div style="margin-top:16px;">
+              <button class="btn" onclick="saveFirewall()"><i class="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOE Wi-Fi Speed Tests -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-wifi" style="margin-right:8px;color:#0d1b6e;"></i>DOE Wi-Fi Speed Tests</h2>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="openWifiModal('DOE Wi-Fi')"><i class="fas fa-plus"></i> Add Test</button>
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="exportToCSV('DOE Wi-Fi')"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="wifiTable">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Location</th>
+                <th>Building / Floor</th>
+                <th>Status</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="wifiBody">
+              <tr>
+                <td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">No speed tests recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Fixed Wireless Speed Tests -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-broadcast-tower" style="margin-right:8px;color:#0d1b6e;"></i>Fixed Wireless Speed Tests
+          </h2>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="openWifiModal('Fixed Wireless')"><i class="fas fa-plus"></i> Add Test</button>
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="exportToCSV('Fixed Wireless')"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="fixedTable">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Location</th>
+                <th>Building / Floor</th>
+                <th>Status</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="fixedBody">
+              <tr>
+                <td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">No speed tests recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Router Speed Tests -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-router" style="margin-right:8px;color:#0d1b6e;"></i>Router Speed Tests</h2>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="openWifiModal('Router')"><i class="fas fa-plus"></i> Add Test</button>
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="exportToCSV('Router')"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="routerTable">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Location</th>
+                <th>Building / Floor</th>
+                <th>Status</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="routerBody">
+              <tr>
+                <td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">No speed tests recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- LAN Speed Tests -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-network-wired" style="margin-right:8px;color:#0d1b6e;"></i>LAN Speed Tests</h2>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="openWifiModal('LAN')"><i class="fas fa-plus"></i> Add Test</button>
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="exportToCSV('LAN')"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="lanTable">
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Location</th>
+                <th>Building / Floor</th>
+                <th>Status</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="lanBody">
+              <tr>
+                <td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">No speed tests recorded yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Wi-Fi Speed Test Modal Form -->
+      <div id="wifiModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-plus"></i> <span
+                id="wifi-modal-header">DOE Wi-Fi Speed Test</span></h3>
+            <button class="close-btn" onclick="closeWifiModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="wf-edit-id">
+            <input type="hidden" id="wf-type" value="DOE Wi-Fi">
+            <h3>Location Info</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Location <span style="color:red;">*</span></label>
+                <input type="text" id="wf-loc" placeholder="e.g. Main Office" required>
+              </div>
+              <div class="form-group">
+                <label>Building / Floor <span style="color:red;">*</span></label>
+                <input type="text" id="wf-bldg" placeholder="e.g. Bldg A, 3rd Floor" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Date <span style="color:red;">*</span></label>
+                <input type="date" id="wf-date" required>
+              </div>
+              <div class="form-group">
+                <label>Time <span style="color:red;">*</span></label>
+                <input type="time" id="wf-time" required>
+              </div>
+            </div>
+            <!-- DOE Wi-Fi Section -->
+            <div id="fields-doe-wifi" class="speed-test-fields">
+              <h3>Speed Test Results</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Laptop Download (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-ldl" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Laptop Upload (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-lul" placeholder="0.0" step="0.1">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Mobile Download (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-mdl" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Mobile Upload (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-mul" placeholder="0.0" step="0.1">
+                </div>
+              </div>
+              <h3>AP Info</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>AP <span style="color:red;">*</span></label>
+                  <input type="text" id="wf-ap" placeholder="e.g. AP-01">
+                </div>
+                <div class="form-group">
+                  <label>Devices Connected <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-dev" placeholder="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- Fixed Wireless Section -->
+            <div id="fields-fixed-wireless" class="speed-test-fields hidden">
+              <h3>Speed Test Results</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Laptop Download (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-ldl-fixed" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Laptop Upload (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-lul-fixed" placeholder="0.0" step="0.1">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Mobile Download (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-mdl-fixed" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Mobile Upload (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-mul-fixed" placeholder="0.0" step="0.1">
+                </div>
+              </div>
+              <h3>AP Info</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>AP <span style="color:red;">*</span></label>
+                  <input type="text" id="wf-ap-fixed" placeholder="e.g. Fixed-AP-01">
+                </div>
+                <div class="form-group">
+                  <label>Devices Connected <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-dev-fixed" placeholder="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- Router Section -->
+            <div id="fields-router" class="speed-test-fields hidden">
+              <h3>Speed Test Results</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Laptop Download (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-ldl-router" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Laptop Upload (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-lul-router" placeholder="0.0" step="0.1">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Mobile Download (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-mdl-router" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Mobile Upload (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-mul-router" placeholder="0.0" step="0.1">
+                </div>
+              </div>
+              <h3>AP Info</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>AP <span style="color:red;">*</span></label>
+                  <input type="text" id="wf-ap-router" placeholder="e.g. Router-AP-01">
+                </div>
+                <div class="form-group">
+                  <label>Devices Connected <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-dev-router" placeholder="0">
+                </div>
+              </div>
+            </div>
+
+            <!-- LAN Section -->
+            <div id="fields-lan" class="speed-test-fields hidden">
+              <h3>LAN Speeds</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Download (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-dl-lan" placeholder="0.0" step="0.1">
+                </div>
+                <div class="form-group">
+                  <label>Upload (Mbps) <span style="color:red;">*</span></label>
+                  <input type="number" id="wf-ul-lan" placeholder="0.0" step="0.1">
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:16px;">
+              <button class="btn" id="btnSaveWifi" onclick="saveWifi()" disabled><i class="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preventive Maintenance Table Display -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-clipboard-check" style="margin-right:8px;color:#0d1b6e;"></i>Preventive Maintenance
+            Checklist</h2>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="openPmModal()"><i class="fas fa-plus"></i> Add Checklist</button>
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="exportToCSV('pmi')"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="pmTable">
+            <thead>
+              <tr>
+                <th>Date Submitted</th>
+                <th>Inspector</th>
+                <th>Status</th>
+                <th style="width: 80px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="pmBody">
+              <tr>
+                <td colspan="4" style="text-align:center;color:#9ca3af;padding:24px;">No checklist records yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Preventive Maintenance Modal Form -->
+      <div id="pmModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-plus"></i> <span
+                id="pm-modal-header">Submit Maintenance Checklist</span></h3>
+            <button class="close-btn" onclick="closePmModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="pm-edit-id">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Date</label>
+                <input type="date" id="pm-date">
+              </div>
+              <div class="form-group">
+                <label>Inspector Name <span style="color:red;">*</span></label>
+                <select id="pm-inspector">
+                  <option value="Albert Joseph De Ocampo">Albert Joseph De Ocampo</option>
+                  <option value="Emmanuel Aldea">Emmanuel Aldea</option>
+                  <option value="Mark Anthony Bathan">Mark Anthony Bathan</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Temperature (°C) <span style="color:red;">*</span></label>
+                <input type="number" id="pm-temp" placeholder="21" required>
+              </div>
+              <div class="form-group">
+                <label>Humidity (%) <span style="color:red;">*</span></label>
+                <input type="number" id="pm-humidity" placeholder="45" required>
+              </div>
+            </div>
+            <h3>Server Room</h3>
+            <label class="check-group"><input type="checkbox" id="pm-c2"> No Dust Build-up</label>
+            <label class="check-group"><input type="checkbox" id="pm-c3"> Power Stable</label>
+            <h3>Network Devices</h3>
+            <label class="check-group"><input type="checkbox" id="pm-c4"> Switches Working</label>
+            <label class="check-group"><input type="checkbox" id="pm-c5"> Firewall Active</label>
+            <h3>Monitoring Room</h3>
+            <label class="check-group"><input type="checkbox" id="pm-c6"> Screens Operational</label>
+            <label class="check-group"><input type="checkbox" id="pm-c7"> Logs Checked</label>
+            <div style="margin-top:16px;">
+              <button class="btn" onclick="savePm()"><i class="fas fa-save"></i> Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function getFirewallLogs() {
+      try { return JSON.parse(localStorage.getItem('firewall_logs_v1') || '[]'); } catch (e) { return []; }
+    }
+
+    function renderFirewallTable() {
+      const logs = getFirewallLogs();
+      const body = document.getElementById('firewallBody');
+      if (logs.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:24px;">No firewall logs recorded yet.</td></tr>';
+        return;
+      }
+      body.innerHTML = logs.map(l => `
+    <tr>
+      <td>${escapeHtml(l.date || '—')} ${escapeHtml(l.time || '')}</td>
+      <td><strong>${escapeHtml(l.number || '—')}</strong></td>
+      <td>${escapeHtml(l.incident || '—')}</td>
+      <td>${escapeHtml(l.country || '—')}</td>
+      <td>${escapeHtml(l.action || '—')}</td>
+      <td style="text-align: center;">
+        <button onclick="editFirewall('${l.id}')" style="border:none; background:none; color:#0d1b6e; cursor:pointer; padding:4px;" title="Edit Log">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="deleteFirewallLog('${l.id}')" style="border:none; background:none; color:#dc2626; cursor:pointer; padding:4px;" title="Delete Log">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+    }
+
+    function editFirewall(id) {
+      const logs = getFirewallLogs();
+      const log = logs.find(l => l.id === id);
+      if (!log) return;
+
+      openFirewallModal();
+      document.getElementById('firewallModal').querySelector('h3').innerText = 'Edit Firewall Log';
+      document.getElementById('fw-edit-id').value = id;
+      document.getElementById('fw-date').value = log.date;
+      document.getElementById('fw-time').value = log.time;
+      document.getElementById('fw-incident').value = log.incident;
+      document.getElementById('fw-number').value = log.number;
+      document.getElementById('fw-action').value = log.action;
+      document.getElementById('fw-remarks').value = log.remarks;
+      document.getElementById('fw-country').value = log.country;
+      document.getElementById('fw-reputation').value = log.reputation || 'VirusTotal';
+      document.getElementById('fw-abuse').value = log.abuse || 'High';
+    }
+
+    function generateFwIncidentNumber() {
+      const logs = getFirewallLogs();
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const count = logs.length + 1;
+      const seq = String(count).padStart(3, '0');
+      return `INC-NM-${year}-${month}-${seq}`;
+    }
+
+    function openFirewallModal() {
+      document.getElementById('firewallModal').querySelector('h3').innerText = 'Log Firewall Action (Incident/Alert)';
+      document.getElementById('fw-edit-id').value = '';
+      document.getElementById('fw-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('fw-time').value = new Date().toTimeString().split(' ')[0].substring(0, 5);
+      document.getElementById('fw-incident').value = '';
+      document.getElementById('fw-number').value = generateFwIncidentNumber();
+      document.getElementById('fw-action').value = '';
+      document.getElementById('fw-remarks').value = '';
+      document.getElementById('fw-country').value = '';
+      document.getElementById('fw-reputation').value = 'VirusTotal';
+      document.getElementById('fw-abuse').value = 'High';
+      document.getElementById('fw-images').value = '';
+      document.getElementById('firewallModal').classList.remove('hidden');
+    }
+
+    function closeFirewallModal() {
+      document.getElementById('firewallModal').classList.add('hidden');
+    }
+
+    function saveFirewall() {
+      const editId = document.getElementById('fw-edit-id').value;
+      const date = document.getElementById("fw-date").value;
+      const time = document.getElementById("fw-time").value;
+      const incident = document.getElementById("fw-incident").value;
+      const country = document.getElementById("fw-country").value;
+      const action = document.getElementById("fw-action").value;
+      const abuse = document.getElementById("fw-abuse").value;
+      const files = document.getElementById("fw-images").files;
+
+      if (!date || !time || !incident || !country || !action) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      // File validation only on new entries OR if files are attached
+      if (!editId || files.length > 0) {
+        if (abuse === 'High') {
+          if (files.length < 1) { alert("At least 1 image is required for HIGH abuse level."); return; }
+        } else {
+          if (files.length < 2) { alert("2 images are required for MEDIUM or LOW abuse level."); return; }
+        }
+      }
+      if (files.length > 2) { alert("Maximum 2 files allowed."); return; }
+
+      if (!confirm("Are you sure you want to save this firewall log?")) return;
+
+      let logs = getFirewallLogs();
+      const logData = {
+        date: date,
+        time: time,
+        incident: incident,
+        number: document.getElementById("fw-number").value,
+        action: action,
+        remarks: document.getElementById("fw-remarks").value,
+        country: country,
+        reputation: document.getElementById("fw-reputation").value,
+        abuse: abuse
+      };
+
+      if (editId) {
+        const idx = logs.findIndex(l => l.id === editId);
+        if (idx !== -1) {
+          logs[idx] = { ...logs[idx], ...logData };
+        }
+      } else {
+        logs.unshift({ id: 'FW' + Date.now(), ...logData });
+      }
+
+      localStorage.setItem('firewall_logs_v1', JSON.stringify(logs));
+      closeFirewallModal();
+      renderFirewallTable();
+    }
+
+    function deleteFirewallLog(id) {
+      if (!confirm("Are you sure you want to delete this firewall log?")) return;
+      let logs = getFirewallLogs();
+      logs = logs.filter(l => l.id !== id);
+      localStorage.setItem('firewall_logs_v1', JSON.stringify(logs));
+      renderFirewallTable();
+    }
+
+    function escapeHtml(s) { return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+    function getWifiLogs() {
+      try { return JSON.parse(localStorage.getItem('wifi_logs_v1') || '[]'); } catch (e) { return []; }
+    }
+
+    function renderWifiTable() {
+      const logs = getWifiLogs();
+
+      const sections = [
+        { type: 'DOE Wi-Fi', bodyId: 'wifiBody' },
+        { type: 'Fixed Wireless', bodyId: 'fixedBody' },
+        { type: 'Router', bodyId: 'routerBody' },
+        { type: 'LAN', bodyId: 'lanBody' }
+      ];
+
+      sections.forEach(sec => {
+        const body = document.getElementById(sec.bodyId);
+        const filtered = logs.filter(l => l.type === sec.type);
+
+        if (filtered.length === 0) {
+          body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">No speed tests recorded yet.</td></tr>';
+        } else {
+          body.innerHTML = filtered.map(l => `
+        <tr>
+          <td>${escapeHtml(l.date || '—')} ${escapeHtml(l.time || '')}</td>
+          <td><strong>${escapeHtml(l.loc || '—')}</strong></td>
+          <td>${escapeHtml(l.bldg || '—')}</td>
+          <td><span class="badge badge-success">Completed</span></td>
+          <td style="text-align: center;">
+            <button onclick="editWifi('${l.id}')" style="border:none; background:none; color:#0d1b6e; cursor:pointer; padding:4px;" title="Edit Test">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button onclick="deleteWifiLog('${l.id}')" style="border:none; background:none; color:#dc2626; cursor:pointer; padding:4px;" title="Delete Log">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+        }
+      });
+    }
+
+    function editWifi(id) {
+      const logs = getWifiLogs();
+      const log = logs.find(l => l.id === id);
+      if (!log) return;
+
+      openWifiModal(log.type);
+      document.getElementById('wifiModal').querySelector('h3').innerText = 'Edit ' + log.type + ' Speed Test';
+      document.getElementById('wf-edit-id').value = id;
+      document.getElementById('wf-bldg').value = log.bldg;
+      document.getElementById('wf-loc').value = log.loc;
+      document.getElementById('wf-date').value = log.date;
+      document.getElementById('wf-time').value = log.time;
+
+      if (log.type === 'DOE Wi-Fi') {
+        document.getElementById('wf-ldl').value = log.ldl || '';
+        document.getElementById('wf-lul').value = log.lul || '';
+        document.getElementById('wf-mdl').value = log.mdl || '';
+        document.getElementById('wf-mul').value = log.mul || '';
+        document.getElementById('wf-ap').value = log.ap || '';
+        document.getElementById('wf-dev').value = log.dev || '';
+      } else if (log.type === 'Fixed Wireless') {
+        document.getElementById('wf-ldl-fixed').value = log.ldl || '';
+        document.getElementById('wf-lul-fixed').value = log.lul || '';
+        document.getElementById('wf-mdl-fixed').value = log.mdl || '';
+        document.getElementById('wf-mul-fixed').value = log.mul || '';
+        document.getElementById('wf-ap-fixed').value = log.ap || '';
+        document.getElementById('wf-dev-fixed').value = log.dev || '';
+      } else if (log.type === 'Router') {
+        document.getElementById('wf-ldl-router').value = log.ldl || '';
+        document.getElementById('wf-lul-router').value = log.lul || '';
+        document.getElementById('wf-mdl-router').value = log.mdl || '';
+        document.getElementById('wf-mul-router').value = log.mul || '';
+        document.getElementById('wf-ap-router').value = log.ap || '';
+        document.getElementById('wf-dev-router').value = log.dev || '';
+      } else if (log.type === 'LAN') {
+        document.getElementById('wf-dl-lan').value = log.dl || '';
+        document.getElementById('wf-ul-lan').value = log.ul || '';
+      }
+      validateWifiForm();
+    }
+
+    function openWifiModal(type = 'DOE Wi-Fi') {
+      document.getElementById('wifiModal').querySelector('h3').innerText = type + ' Speed Test';
+      document.getElementById('wf-edit-id').value = '';
+      document.getElementById('wf-type').value = type;
+      document.getElementById('wf-loc').value = '';
+      document.getElementById('wf-bldg').value = '';
+      document.getElementById('wf-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('wf-time').value = new Date().toTimeString().split(' ')[0].substring(0, 5);
+
+      // Clear all sections
+      document.querySelectorAll('.speed-test-fields').forEach(div => div.classList.add('hidden'));
+
+      // Clear all fields safely
+      const fields = [
+        'wf-loc', 'wf-bldg', 'wf-ldl', 'wf-lul', 'wf-mdl', 'wf-mul', 'wf-ap', 'wf-dev',
+        'wf-ldl-fixed', 'wf-lul-fixed', 'wf-mdl-fixed', 'wf-mul-fixed', 'wf-ap-fixed', 'wf-dev-fixed',
+        'wf-ldl-router', 'wf-lul-router', 'wf-mdl-router', 'wf-mul-router', 'wf-ap-router', 'wf-dev-router',
+        'wf-dl-lan', 'wf-ul-lan'
+      ];
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+      });
+
+      // Show relevant section
+      if (type === 'DOE Wi-Fi') document.getElementById('fields-doe-wifi').classList.remove('hidden');
+      else if (type === 'Fixed Wireless') document.getElementById('fields-fixed-wireless').classList.remove('hidden');
+      else if (type === 'Router') document.getElementById('fields-router').classList.remove('hidden');
+      else if (type === 'LAN') document.getElementById('fields-lan').classList.remove('hidden');
+
+      document.getElementById('wifiModal').classList.remove('hidden');
+      validateWifiForm();
+    }
+
+    function closeWifiModal() {
+      document.getElementById('wifiModal').classList.add('hidden');
+    }
+
+    function saveWifi() {
+      const editId = document.getElementById('wf-edit-id').value;
+      const type = document.getElementById('wf-type').value;
+      const bldg = document.getElementById("wf-bldg").value;
+      const loc = document.getElementById("wf-loc").value;
+      const date = document.getElementById("wf-date").value;
+      const time = document.getElementById("wf-time").value;
+
+      if (!bldg || !loc || !date || !time) {
+        alert("Please fill in location and date/time info.");
+        return;
+      }
+
+      const logData = { bldg, loc, date, time, type };
+
+      if (type === 'DOE Wi-Fi') {
+        logData.ldl = document.getElementById('wf-ldl').value;
+        logData.lul = document.getElementById('wf-lul').value;
+        logData.mdl = document.getElementById('wf-mdl').value;
+        logData.mul = document.getElementById('wf-mul').value;
+        logData.ap = document.getElementById('wf-ap').value;
+        logData.dev = document.getElementById('wf-dev').value;
+      } else if (type === 'Fixed Wireless') {
+        logData.ldl = document.getElementById('wf-ldl-fixed').value;
+        logData.lul = document.getElementById('wf-lul-fixed').value;
+        logData.mdl = document.getElementById('wf-mdl-fixed').value;
+        logData.mul = document.getElementById('wf-mul-fixed').value;
+        logData.ap = document.getElementById('wf-ap-fixed').value;
+        logData.dev = document.getElementById('wf-dev-fixed').value;
+      } else if (type === 'Router') {
+        logData.ldl = document.getElementById('wf-ldl-router').value;
+        logData.lul = document.getElementById('wf-lul-router').value;
+        logData.mdl = document.getElementById('wf-mdl-router').value;
+        logData.mul = document.getElementById('wf-mul-router').value;
+        logData.ap = document.getElementById('wf-ap-router').value;
+        logData.dev = document.getElementById('wf-dev-router').value;
+      } else if (type === 'LAN') {
+        logData.dl = document.getElementById('wf-dl-lan').value;
+        logData.ul = document.getElementById('wf-ul-lan').value;
+      }
+
+      if (!confirm("Are you sure you want to save this speed test log?")) return;
+      let logs = getWifiLogs();
+
+      if (editId) {
+        const idx = logs.findIndex(l => l.id === editId);
+        if (idx !== -1) {
+          logs[idx] = { ...logs[idx], ...logData };
+        }
+      } else {
+        logs.unshift({ id: 'WF' + Date.now(), ...logData });
+      }
+
+      localStorage.setItem('wifi_logs_v1', JSON.stringify(logs));
+      closeWifiModal();
+      renderWifiTable();
+    }
+
+    function deleteWifiLog(id) {
+      if (!confirm("Are you sure you want to delete this Wi-Fi log?")) return;
+      let logs = getWifiLogs();
+      logs = logs.filter(l => l.id !== id);
+      localStorage.setItem('wifi_logs_v1', JSON.stringify(logs));
+      renderWifiTable();
+    }
+
+    function getPmLogs() {
+      try { return JSON.parse(localStorage.getItem('pm_logs_v1') || '[]'); } catch (e) { return []; }
+    }
+
+    function renderPmTable() {
+      const logs = getPmLogs();
+      const body = document.getElementById('pmBody');
+      if (logs.length === 0) {
+        body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:24px;">No checklist records yet.</td></tr>';
+        return;
+      }
+      body.innerHTML = logs.map(l => `
+    <tr>
+      <td>${escapeHtml(l.date || '—')}</td>
+      <td><strong>${escapeHtml(l.inspector || '—')}</strong></td>
+      <td><span class="badge badge-success">Submitted</span></td>
+      <td style="text-align: center;">
+        <button onclick="editPm('${l.id}')" style="border:none; background:none; color:#0d1b6e; cursor:pointer; padding:4px;" title="Edit Log">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button onclick="deletePmLog('${l.id}')" style="border:none; background:none; color:#dc2626; cursor:pointer; padding:4px;" title="Delete Log">
+          <i class="fas fa-trash"></i>
+        </button>
+      </td>
+    </tr>
+  `).join('');
+    }
+
+    function editPm(id) {
+      const logs = getPmLogs();
+      const log = logs.find(l => l.id === id);
+      if (!log) return;
+
+      openPmModal();
+      document.getElementById('pmModal').querySelector('h3').innerText = 'Edit Maintenance Checklist';
+      document.getElementById('pm-edit-id').value = id;
+      document.getElementById('pm-date').value = log.date;
+      document.getElementById('pm-inspector').value = log.inspector;
+      document.getElementById('pm-temp').value = log.temp;
+      document.getElementById('pm-humidity').value = log.humidity;
+      document.getElementById('pm-c2').checked = log.c2 || false;
+      document.getElementById('pm-c3').checked = log.c3 || false;
+      document.getElementById('pm-c4').checked = log.c4 || false;
+      document.getElementById('pm-c5').checked = log.c5 || false;
+      document.getElementById('pm-c6').checked = log.c6 || false;
+      document.getElementById('pm-c7').checked = log.c7 || false;
+    }
+
+    function openPmModal() {
+      document.getElementById('pmModal').querySelector('h3').innerText = 'Submit Maintenance Checklist';
+      document.getElementById('pm-edit-id').value = '';
+      document.getElementById('pm-date').value = new Date().toISOString().split('T')[0];
+      document.getElementById('pm-inspector').value = 'AJMD';
+      document.getElementById('pm-temp').value = '';
+      document.getElementById('pm-humidity').value = '';
+      document.getElementById('pm-c2').checked = false;
+      document.getElementById('pm-c3').checked = false;
+      document.getElementById('pm-c4').checked = false;
+      document.getElementById('pm-c5').checked = false;
+      document.getElementById('pm-c6').checked = false;
+      document.getElementById('pm-c7').checked = false;
+      document.getElementById('pmModal').classList.remove('hidden');
+    }
+
+    function closePmModal() {
+      document.getElementById('pmModal').classList.add('hidden');
+    }
+
+    function savePm() {
+      const editId = document.getElementById('pm-edit-id').value;
+      const date = document.getElementById("pm-date").value;
+      const inspector = document.getElementById("pm-inspector").value;
+      const temp = document.getElementById("pm-temp").value;
+      const humidity = document.getElementById("pm-humidity").value;
+
+      if (!date || !inspector || !temp || !humidity) {
+        alert("Please fill in all required fields.");
+        return;
+      }
+
+      if (!confirm("Are you sure you want to save this checklist?")) return;
+      let logs = getPmLogs();
+      const logData = {
+        date: date,
+        inspector: inspector,
+        temp: temp,
+        humidity: humidity,
+        c2: document.getElementById('pm-c2').checked,
+        c3: document.getElementById('pm-c3').checked,
+        c4: document.getElementById('pm-c4').checked,
+        c5: document.getElementById('pm-c5').checked,
+        c6: document.getElementById('pm-c6').checked,
+        c7: document.getElementById('pm-c7').checked
+      };
+
+      if (editId) {
+        const idx = logs.findIndex(l => l.id === editId);
+        if (idx !== -1) {
+          logs[idx] = { ...logs[idx], ...logData };
+        }
+      } else {
+        logs.unshift({ id: 'PM' + Date.now(), ...logData });
+      }
+
+      localStorage.setItem('pm_logs_v1', JSON.stringify(logs));
+      closePmModal();
+      renderPmTable();
+    }
+
+    function exportToCSV(type) {
+      let data = [];
+      let filename = 'report.csv';
+
+      if (type === 'firewall') {
+        data = getFirewallLogs();
+        filename = 'firewall_logs.csv';
+      } else if (['DOE Wi-Fi', 'Fixed Wireless', 'Router', 'LAN'].includes(type)) {
+        data = getWifiLogs().filter(l => l.type === type);
+        filename = type.toLowerCase().replace(/ /g, '_') + '_speed_tests.csv';
+      } else if (type === 'pmi') {
+        data = getPmLogs();
+        filename = 'maintenance_checklist.csv';
+      }
+
+      if (data.length === 0) {
+        alert("No data available to export.");
+        return;
+      }
+
+      const headers = Object.keys(data[0]);
+      const csvRows = [];
+      csvRows.push(headers.join(','));
+
+      for (const row of data) {
+        const values = headers.map(header => {
+          const val = row[header] + '';
+          return '"' + val.replace(/"/g, '""') + '"';
+        });
+        csvRows.push(values.join(','));
+      }
+
+      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('hidden', '');
+      a.setAttribute('href', url);
+      a.setAttribute('download', filename);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    function deletePmLog(id) {
+      if (!confirm("Are you sure you want to delete this checklist log?")) return;
+      let logs = getPmLogs();
+      logs = logs.filter(l => l.id !== id);
+      localStorage.setItem('pm_logs_v1', JSON.stringify(logs));
+      renderPmTable();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderFirewallTable();
+      renderWifiTable();
+      renderPmTable();
+    });
+
+    // RBAC: Hide User Management for non-admins
+    const userRole = localStorage.getItem('role');
+    if (userRole !== 'Admin') {
+      const navUsers = document.getElementById('nav-users');
+      if (navUsers) navUsers.style.display = 'none';
+    }
+
+    // Section Toggling
+    document.querySelectorAll('.section-minimize-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.section-block, .inner-section');
+        card.classList.toggle('collapsed');
+        const icon = btn.querySelector('i');
+        icon.className = card.classList.contains('collapsed') ? 'fas fa-plus' : 'fas fa-minus';
+      });
+    });
+
+    // Sidebar Dropdown Toggle
+    document.querySelectorAll('.dropdown-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.parentElement;
+        const isOpen = parent.classList.contains('open');
+
+        // Close other dropdowns
+        document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+
+        // Toggle current
+        if (!isOpen) {
+          parent.classList.add('open');
+        }
+      });
+    });
+    // Validation Function
+    function validateWifiForm() {
+      const type = document.getElementById('wf-type').value;
+      const baseFilled = ['wf-loc', 'wf-bldg', 'wf-date', 'wf-time'].every(id => document.getElementById(id).value.trim() !== '');
+      let extraFilled = true;
+
+      if (type === 'DOE Wi-Fi') {
+        extraFilled = ['wf-ldl', 'wf-lul', 'wf-mdl', 'wf-mul', 'wf-ap', 'wf-dev'].every(id => document.getElementById(id).value.trim() !== '');
+      } else if (type === 'Fixed Wireless') {
+        extraFilled = ['wf-ldl-fixed', 'wf-lul-fixed', 'wf-mdl-fixed', 'wf-mul-fixed', 'wf-ap-fixed', 'wf-dev-fixed'].every(id => document.getElementById(id).value.trim() !== '');
+      } else if (type === 'Router') {
+        extraFilled = ['wf-ldl-router', 'wf-lul-router', 'wf-mdl-router', 'wf-mul-router', 'wf-ap-router', 'wf-dev-router'].every(id => document.getElementById(id).value.trim() !== '');
+      } else if (type === 'LAN') {
+        extraFilled = ['wf-dl-lan', 'wf-ul-lan'].every(id => document.getElementById(id).value.trim() !== '');
+      }
+
+      document.getElementById('btnSaveWifi').disabled = !(baseFilled && extraFilled);
+    }
+
+    document.querySelectorAll('#wifiModal input').forEach(inp => {
+      inp.addEventListener('input', validateWifiForm);
+    });
+  </script>
+</body>
+</html>
