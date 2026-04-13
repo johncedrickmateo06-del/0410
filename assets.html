@@ -115,8 +115,27 @@
       margin-top: 8px;
     }
 
+    /* Small Option CRUD Modal */
+    .opt-modal-content {
+      width: 350px;
+    }
+
     .btn-save:hover {
       background: #0a1452;
+    }
+
+    .manage-btn {
+      color: #0d1b6e;
+      font-size: 11px;
+      cursor: pointer;
+      margin-left: 5px;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+      vertical-align: middle;
+    }
+
+    .manage-btn:hover {
+      opacity: 1;
     }
   </style>
 </head>
@@ -190,8 +209,8 @@
     <main class="main-content">
       <h1 class="page-title">Asset Manager</h1>
 
-      <!-- Summary Cards -->
-      <div class="stat-grid" style="margin-bottom:16px;">
+      <!-- Summary Cards (Hardware & Software) -->
+      <div class="stat-grid" style="grid-template-columns: repeat(5, 1fr); margin-bottom:16px;">
         <div class="stat-card">
           <div class="card-category"><i class="fas fa-sitemap"></i>Routers</div>
           <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
@@ -206,6 +225,11 @@
           <div class="card-category"><i class="fas fa-wifi"></i>Access Points</div>
           <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
           <div class="card-value" id="apCount">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="card-category"><i class="fas fa-laptop-code"></i>Software</div>
+          <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
+          <div class="card-value" id="softwareCount">0</div>
         </div>
         <div class="stat-card" style="background:#f4f6fc;">
           <div class="card-category" style="color:#0d1b6e;"><i class="fas fa-boxes"></i>Total Assets</div>
@@ -287,54 +311,71 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
               <input type="hidden" id="editAssetId">
               <div class="modal-form-group" style="grid-column: 1 / -1;">
-                <label>Device Name</label>
+                <label>Device Name <span style="color:red;">*</span></label>
                 <input type="text" id="editName">
               </div>
               <div class="modal-form-group">
-                <label>Type</label>
-                <select id="editType">
-                  <option>Router</option>
-                  <option>Switch</option>
-                  <option>Access Point</option>
-                </select>
+                <label>Type <span style="color:red;">*</span> <i class="fas fa-cog manage-btn"
+                    onclick="openOptModal('hw_types')" title="Manage Options"></i></label>
+                <select id="editType"></select>
               </div>
               <div class="modal-form-group">
-                <label>Location</label>
-                <select id="editLocation">
-                  <option>HQ</option>
-                  <option>Branch</option>
-                </select>
+                <label>Location <span style="color:red;">*</span> <i class="fas fa-cog manage-btn"
+                    onclick="openOptModal('hw_locs')" title="Manage Options"></i></label>
+                <select id="editLocation"></select>
               </div>
               <div class="modal-form-group">
-                <label>VLAN</label>
-                <input type="text" id="editVLAN">
+                <label>VLAN <span style="color:red;">*</span> <i class="fas fa-cog manage-btn"
+                    onclick="openOptModal('hw_vlans')" title="Manage Options"></i></label>
+                <select id="editVLAN"></select>
               </div>
               <div class="modal-form-group">
-                <label>Floor</label>
-                <input type="text" id="editFloor">
+                <label>Floor <span style="color:red;">*</span> <i class="fas fa-cog manage-btn"
+                    onclick="openOptModal('hw_floors')" title="Manage Options"></i></label>
+                <select id="editFloor"></select>
               </div>
               <div class="modal-form-group">
-                <label>Brand</label>
+                <label>Brand <span style="color:red;">*</span></label>
                 <input type="text" id="editBrand">
               </div>
               <div class="modal-form-group">
-                <label>Model</label>
+                <label>Model <span style="color:red;">*</span></label>
                 <input type="text" id="editModel">
               </div>
               <div class="modal-form-group">
-                <label>Serial</label>
+                <label>Serial <span style="color:red;">*</span></label>
                 <input type="text" id="editSerial">
               </div>
               <div class="modal-form-group">
-                <label>Vendor</label>
+                <label>Vendor <span style="color:red;">*</span></label>
                 <input type="text" id="editVendor">
               </div>
               <div class="modal-form-group" style="grid-column: 1 / -1;">
-                <label>Date Acquired</label>
+                <label>Date Acquired <span style="color:red;">*</span></label>
                 <input type="date" id="editDate">
               </div>
             </div>
             <button class="btn-save" onclick="saveAssetEdit()">Save Changes</button>
+          </div>
+        </div>
+      </div>
+      <!-- Option Manager Modal -->
+      <div id="optModal" class="modal-overlay hidden">
+        <div class="modal-content opt-modal-content">
+          <div class="modal-header">
+            <h3 style="margin:0;font-size:14px;color:#0d1b6e;"><i class="fas fa-list-ul"></i> Manage Options</h3>
+            <button class="close-btn" onclick="closeOptModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <input type="text" id="newOptVal" placeholder="New option name..."
+                style="padding:8px; font-size:12px; border:1px solid #d1d5db; border-radius:4px; flex:1;">
+              <button class="btn" style="padding:6px 14px; font-size:12px; height:32px;"
+                onclick="addOption()">Add</button>
+            </div>
+            <div id="optList"
+              style="max-height:200px; overflow-y:auto; border:1px solid #e5e7eb; border-radius:6px; padding:4px;">
+            </div>
           </div>
         </div>
       </div>
@@ -390,8 +431,9 @@
       isEditing = false;
       document.getElementById('editAssetId').value = '';
       document.getElementById('editName').value = '';
-      document.getElementById('editType').value = 'Router';
-      document.getElementById('editLocation').value = 'HQ';
+
+      populateDropdowns();
+
       document.getElementById('editVLAN').value = '';
       document.getElementById('editFloor').value = '';
       document.getElementById('editBrand').value = '';
@@ -409,10 +451,12 @@
       const asset = assets.find(a => a.id === id);
       if (!asset) return;
 
+      populateDropdowns();
+
       document.getElementById('editAssetId').value = asset.id;
       document.getElementById('editName').value = asset.name || '';
-      document.getElementById('editType').value = asset.type || 'Router';
-      document.getElementById('editLocation').value = asset.location || 'HQ';
+      document.getElementById('editType').value = asset.type || '';
+      document.getElementById('editLocation').value = asset.location || '';
       document.getElementById('editVLAN').value = asset.vlan || '';
       document.getElementById('editFloor').value = asset.floor || '';
       document.getElementById('editBrand').value = asset.brand || '';
@@ -430,12 +474,172 @@
     }
 
     function generateReport() {
-      if (confirm("Are you sure you want to generate a report for the current inventory?")) {
-        alert("Report generated successfully!");
-      }
+      // Read current filter state
+      const loc = document.getElementById('filterLocation').value;
+      const vlan = document.getElementById('filterVLAN').value;
+      const type = document.getElementById('filterType').value;
+      const floor = document.getElementById('filterFloor').value;
+      const brand = document.getElementById('filterBrand').value.trim().toLowerCase();
+      const model = document.getElementById('filterModel').value.trim().toLowerCase();
+      const vendor = document.getElementById('filterVendor').value.trim().toLowerCase();
+      const dateSelected = document.getElementById('filterDate').value;
+
+      const data = assets.filter(a =>
+        (loc === '' || a.location === loc) &&
+        (vlan === '' || a.vlan === vlan) &&
+        (type === '' || a.type === type) &&
+        (floor === '' || (a.floor && a.floor === floor)) &&
+        (brand === '' || (a.brand && a.brand.toLowerCase().includes(brand))) &&
+        (model === '' || ((a.model && a.model.toLowerCase().includes(model)) || (a.serial && a.serial.toLowerCase().includes(model)))) &&
+        (vendor === '' || (a.vendor && a.vendor.toLowerCase().includes(vendor))) &&
+        (dateSelected === '' || (() => {
+          if (!a.date_acquired) return false;
+          const d = new Date(a.date_acquired);
+          const sel = new Date(dateSelected);
+          const start = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate());
+          const end = new Date(sel.getFullYear(), sel.getMonth(), sel.getDate(), 23, 59, 59, 999);
+          return d >= start && d <= end;
+        })())
+      );
+
+      const active = [loc, vlan, type, floor, brand, model, vendor, dateSelected].filter(Boolean);
+      const subtitle = active.length ? 'Active Filters Applied' : 'Complete Hardware Inventory';
+      const now = new Date().toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' });
+
+      const byType = {};
+      data.forEach(a => { byType[a.type] = (byType[a.type] || 0) + 1; });
+      const summaryCards = Object.entries(byType).map(([t, c]) =>
+        `<div class="summary-card"><div class="val">${c}</div><div class="lbl">${t}</div></div>`
+      ).join('');
+
+      const rows = data.map(a => `<tr>
+        <td><strong>${a.name}</strong></td>
+        <td>${a.type}</td>
+        <td>${a.location || '—'}</td>
+        <td>${a.vlan || '—'}</td>
+        <td>${a.floor || '—'}</td>
+        <td>${a.brand || '—'}</td>
+        <td>${a.model || '—'}</td>
+        <td>${a.serial || '—'}</td>
+        <td>${a.vendor || '—'}</td>
+        <td>${a.date_acquired || '—'}</td>
+      </tr>`).join('');
+
+      const table = data.length ? `<table>
+        <thead><tr><th>Device Name</th><th>Type</th><th>Location</th><th>VLAN</th><th>Floor</th><th>Brand</th><th>Model</th><th>Serial</th><th>Vendor</th><th>Date Acquired</th></tr></thead>
+        <tbody>${rows}</tbody></table>` : '<p style="color:#9ca3af;margin-top:16px;">No assets match the selected filters.</p>';
+
+      const header = `<div style="display:flex;align-items:center;gap:18px;border-bottom:3px solid #0d1b6e;padding-bottom:14px;margin-bottom:20px;">
+        <div>
+          <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Department of Energy – Information Technology Division</div>
+          <h1 style="margin:4px 0 2px;font-size:22px;color:#0d1b6e;">Hardware Asset Inventory Report</h1>
+          <div style="font-size:12px;color:#374151;">${subtitle}</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;font-size:11px;color:#9ca3af;">Generated: ${now}<br>ITD AOMS</div>
+      </div>`;
+
+      const w = window.open('', '_blank');
+      w.document.write(`<!DOCTYPE html><html lang="en"><head>
+        <meta charset="UTF-8">
+        <title>Hardware Asset Report – ITD AOMS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:'Inter',Arial,sans-serif;font-size:12px;color:#111827;padding:32px 40px;background:#fff}
+          table{width:100%;border-collapse:collapse;margin-top:12px;font-size:11px}
+          th{background:#0d1b6e;color:#fff;padding:7px 9px;text-align:left;font-weight:600;}
+          td{padding:6px 9px;border-bottom:1px solid #e5e7eb;color:#374151;}
+          tr:nth-child(even) td{background:#f9fafb}
+          .summary{display:flex;gap:12px;margin:12px 0 18px;flex-wrap:wrap;}
+          .summary-card{border:1px solid #e5e7eb;border-radius:6px;padding:10px 14px;background:#f9fafb;min-width:100px;}
+          .val{font-size:22px;font-weight:800;color:#0d1b6e;} .lbl{font-size:11px;color:#6b7280;}
+          .print-actions{display:flex; justify-content:center; gap:12px; margin-top:24px;}
+          .print-btn{padding:10px 24px; background:#0d1b6e; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;}
+          .export-btn{background:#10b981;}
+          @media print{.no-print, .print-actions{display:none !important;} body{padding:16px;}}        </style>
+      </head><body>
+        ${header}
+        <div class="summary"><div class="summary-card"><div class="val">${data.length}</div><div class="lbl">Total Assets</div></div>${summaryCards}</div>
+        ${table}
+        <div class="print-actions">
+          <button class="print-btn export-btn" onclick="exportTableToCSV()">📥 Export as CSV</button>
+          <button class="print-btn" onclick="window.print()">🖨 Print Report</button>
+        </div>
+        <script>
+          (function() {
+            const table = document.querySelector('table');
+            if (!table) return;
+            const ths = table.querySelectorAll('th');
+            let filterHtml = '<div class="no-print" style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px; padding:12px; margin-bottom:16px;">';
+            filterHtml += '<h4 style="margin:0 0 8px; font-size:12px; color:#374151;"><i class="fas fa-filter"></i> Select Columns to Include</h4>';
+            filterHtml += '<div style="display:flex; flex-wrap:wrap; gap:14px; font-size:12px;">';
+            ths.forEach((th, i) => {
+              filterHtml += \`<label style="cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" id="col-\${i}" checked onchange="toggleColumn(\${i})" style="accent-color:#0d1b6e;"> \${th.innerText}</label>\`;
+            });
+            filterHtml += '</div></div>';
+            table.insertAdjacentHTML('beforebegin', filterHtml);
+          })();
+
+          function toggleColumn(index) {
+            const table = document.querySelector('table');
+            if (!table) return;
+            const isChecked = document.getElementById('col-' + index).checked;
+            const ths = table.querySelectorAll('th');
+            if(ths[index]) ths[index].style.display = isChecked ? '' : 'none';
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+              const tds = row.querySelectorAll('td');
+              if(tds[index]) tds[index].style.display = isChecked ? '' : 'none';
+            });
+          }
+
+          function exportTableToCSV() {
+            const table = document.querySelector('table');
+            if (!table) return;
+            let csv = [];
+            const rows = table.querySelectorAll('tr');
+            for (let i = 0; i < rows.length; i++) {
+                let row = [], cols = rows[i].querySelectorAll('td, th');
+                for (let j = 0; j < cols.length; j++) {
+                    if (cols[j].style.display !== 'none') {
+                        let data = cols[j].innerText.replace(/(\\r\\n|\\n|\\r)/gm, ' ').replace(/"/g, '""');
+                        row.push('"' + data + '"');
+                    }
+                }
+                csv.push(row.join(','));
+            }
+            const csvFile = new Blob([csv.join('\\n')], {type: 'text/csv'});
+            const downloadLink = document.createElement('a');
+            let title = document.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'export';
+            downloadLink.download = title + '.csv';
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          }
+        <\/script>
+      </body></html>`);
+      w.document.close();
     }
 
     function saveAssetEdit() {
+      const name = document.getElementById('editName').value.trim();
+      const type = document.getElementById('editType').value;
+      const loc = document.getElementById('editLocation').value;
+      const vlan = document.getElementById('editVLAN').value;
+      const floor = document.getElementById('editFloor').value;
+      const brand = document.getElementById('editBrand').value.trim();
+      const model = document.getElementById('editModel').value.trim();
+      const serial = document.getElementById('editSerial').value.trim();
+      const vendor = document.getElementById('editVendor').value.trim();
+      const date = document.getElementById('editDate').value;
+
+      if (!name || !type || !loc || !vlan || !floor || !brand || !model || !serial || !vendor || !date) {
+        alert("Please fill in all mandatory fields (marked with *).");
+        return;
+      }
+
       if (!confirm("Are you sure you want to save this asset?")) return;
 
       if (isEditing) {
@@ -486,7 +690,11 @@
       document.getElementById("routerCount").innerText = data.filter(a => a.type === "Router").length;
       document.getElementById("switchCount").innerText = data.filter(a => a.type === "Switch").length;
       document.getElementById("apCount").innerText = data.filter(a => a.type === "Access Point").length;
-      document.getElementById("totalCount").innerText = data.length;
+
+      const software = JSON.parse(localStorage.getItem('software_assets_v1') || '[]');
+      document.getElementById("softwareCount").innerText = software.length;
+
+      document.getElementById("totalCount").innerText = data.length + software.length;
     }
 
     function filterAssets() {
@@ -518,6 +726,76 @@
       );
       renderTable(filtered);
     }
+
+    // Option Manager Logic
+    let currentOptKey = '';
+    const defOpts = {
+      hw_types: ['Router', 'Switch', 'Access Point'],
+      hw_locs: ['HQ', 'Branch'],
+      hw_vlans: ['VLAN 10', 'VLAN 20', 'VLAN 30'],
+      hw_floors: ['1', '2', '3', '4', '5']
+    };
+
+    function getOptions(key) {
+      try {
+        let opts = JSON.parse(localStorage.getItem(key));
+        if (!opts || !Array.isArray(opts)) {
+          localStorage.setItem(key, JSON.stringify(defOpts[key]));
+          return defOpts[key];
+        }
+        return opts;
+      } catch (e) { return defOpts[key]; }
+    }
+
+    function openOptModal(key) {
+      currentOptKey = key;
+      renderOptList();
+      document.getElementById('optModal').classList.remove('hidden');
+    }
+    function closeOptModal() {
+      document.getElementById('optModal').classList.add('hidden');
+      const aid = document.getElementById('editAssetId').value;
+      if (aid) { openEditModal(parseInt(aid)); } else { openAddModal(); }
+    }
+    function renderOptList() {
+      const opts = getOptions(currentOptKey);
+      const list = document.getElementById('optList');
+      list.innerHTML = opts.map((o, idx) => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:8px; border-bottom:1px solid #f3f4f6; font-size:12px;">
+          <span>${escapeHtml(o)}</span>
+          <i class="fas fa-trash" style="color:#dc2626; cursor:pointer;" onclick="removeOption(${idx})"></i>
+        </div>
+      `).join('');
+    }
+    function addOption() {
+      const val = document.getElementById('newOptVal').value.trim();
+      if (!val) return;
+      let opts = getOptions(currentOptKey);
+      if (!opts.includes(val)) {
+        opts.push(val);
+        localStorage.setItem(currentOptKey, JSON.stringify(opts));
+      }
+      document.getElementById('newOptVal').value = '';
+      renderOptList();
+    }
+    function removeOption(idx) {
+      let opts = getOptions(currentOptKey);
+      opts.splice(idx, 1);
+      localStorage.setItem(currentOptKey, JSON.stringify(opts));
+      renderOptList();
+    }
+    function populateDropdowns() {
+      const types = getOptions('hw_types');
+      const locs = getOptions('hw_locs');
+      const vlans = getOptions('hw_vlans');
+      const floors = getOptions('hw_floors');
+
+      document.getElementById('editType').innerHTML = types.map(o => `<option>${escapeHtml(o)}</option>`).join('');
+      document.getElementById('editLocation').innerHTML = locs.map(o => `<option>${escapeHtml(o)}</option>`).join('');
+      document.getElementById('editVLAN').innerHTML = vlans.map(o => `<option>${escapeHtml(o)}</option>`).join('');
+      document.getElementById('editFloor').innerHTML = floors.map(o => `<option>${escapeHtml(o)}</option>`).join('');
+    }
+    function escapeHtml(s) { return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
     renderTable(assets);
 
