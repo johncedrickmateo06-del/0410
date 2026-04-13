@@ -36,39 +36,39 @@
           <span>Dashboard</span></a>
 
         <!-- Services -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-services-group">
           <button class="dropdown-btn">
             <i class="fas fa-tools"></i> <span>Services</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="services.html">Service Requests</a>
-            <a href="posting.html">Website Posting Logs</a>
+            <a href="services.html" id="nav-service-requests">Service Requests</a>
+            <a href="posting.html" id="nav-website-posting">Website Posting Logs</a>
           </div>
         </div>
 
         <!-- Operations Monitoring -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-ops-group">
           <button class="dropdown-btn">
             <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="network.html">Network Monitoring</a>
-            <a href="systems.html">Systems Monitoring</a>
-            <a href="database.html">Database Monitoring</a>
+            <a href="network.html" id="nav-network">Network Monitoring</a>
+            <a href="systems.html" id="nav-systems">Systems Monitoring</a>
+            <a href="database.html" id="nav-database">Database Monitoring</a>
           </div>
         </div>
 
         <!-- Asset Management -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-assets-group">
           <button class="dropdown-btn">
             <i class="fas fa-boxes"></i> <span>Asset Management</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="assets.html">Hardware Assets</a>
-            <a href="softwareasset.html">Software Assets</a>
+            <a href="assets.html" id="nav-hardware">Hardware Assets</a>
+            <a href="softwareasset.html" id="nav-software">Software Assets</a>
           </div>
         </div>
         <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
@@ -95,10 +95,10 @@
           <div class="card-value" id="dashTotalServices">0</div>
           <div class="card-label">Total active requests</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" id="card-uptime">
           <div class="card-category"><i class="fas fa-chart-line"></i>Operations</div>
           <button class="section-minimize-btn stat-min-btn"><i class="fas fa-minus"></i></button>
-          <div class="card-value" style="color:#059669;">99.8%</div>
+          <div class="card-value" style="color:#059669;" id="dashUptime">99.9%</div>
           <div class="card-label">Monthly system uptime</div>
         </div>
         <div class="stat-card">
@@ -135,7 +135,9 @@
               </tr>
             </thead>
             <tbody id="recentTicketsBody">
-              <tr><td colspan="3" style="text-align:center;color:#9ca3af;padding:16px;">No recent requests found.</td></tr>
+              <tr>
+                <td colspan="3" style="text-align:center;color:#9ca3af;padding:16px;">No recent requests found.</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -158,21 +160,11 @@
               </tr>
             </thead>
             <tbody>
+            <tbody id="systemsStatusBody">
               <tr>
-                <td><strong>doe.gov.ph</strong></td>
-                <td>192.168.1.10</td>
-                <td><span class="badge badge-up">UP</span></td>
+                <td colspan="3" style="text-align:center;color:#9ca3af;padding:16px;">Loading systems...</td>
               </tr>
-              <tr>
-                <td><strong>comsv2</strong></td>
-                <td>192.168.1.11</td>
-                <td><span class="badge badge-up">UP</span></td>
-              </tr>
-              <tr>
-                <td><strong>payroll</strong></td>
-                <td>192.168.1.12</td>
-                <td><span class="badge badge-down">DOWN</span></td>
-              </tr>
+            </tbody>
             </tbody>
           </table>
         </div>
@@ -197,9 +189,11 @@
               <th>Date Acquired</th>
             </tr>
           </thead>
-            <tbody id="recentAssetsBody">
-              <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:16px;">No recent assets logged.</td></tr>
-            </tbody>
+          <tbody id="recentAssetsBody">
+            <tr>
+              <td colspan="5" style="text-align:center;color:#9ca3af;padding:16px;">No recent assets logged.</td>
+            </tr>
+          </tbody>
         </table>
       </div>
 
@@ -223,16 +217,11 @@
               </tr>
             </thead>
             <tbody>
+            <tbody id="networkLogsBody">
               <tr>
-                <td>Unauthorized Access</td>
-                <td>IP Blocked</td>
-                <td><span class="badge badge-failed">Alert</span></td>
+                <td colspan="3" style="text-align:center;color:#9ca3af;padding:16px;">No recent logs.</td>
               </tr>
-              <tr>
-                <td>High Latency</td>
-                <td>Router Restart</td>
-                <td><span class="badge badge-success">Resolved</span></td>
-              </tr>
+            </tbody>
             </tbody>
           </table>
         </div>
@@ -254,14 +243,11 @@
               </tr>
             </thead>
             <tbody>
+            <tbody id="webPostingsBody">
               <tr>
-                <td>DOE Guidelines...</td>
-                <td>Apr 1, 2:00 PM</td>
+                <td colspan="2" style="text-align:center;color:#9ca3af;padding:16px;">No recent postings.</td>
               </tr>
-              <tr>
-                <td>Energy Saving Tip...</td>
-                <td>Mar 30, 10:00 AM</td>
-              </tr>
+            </tbody>
             </tbody>
           </table>
         </div>
@@ -311,16 +297,7 @@
     function escapeHtml(s) { return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
 
     function updateDashboardData() {
-      // Ensure we have some default hardware logged if it's perfectly clean and unpopulated
-      if(!localStorage.getItem('hardware_assets_v1')) {
-         localStorage.setItem('hardware_assets_v1', JSON.stringify([
-           {id: 1, name: "Router-1", type: "Router", location: "HQ", vlan: "VLAN 10", floor: "1", brand: "Cisco", model: "ISR4451", serial: "R1-0001", vendor: "Procurement", date_acquired: "2023-02-15"},
-           {id: 2, name: "Switch-1", type: "Switch", location: "HQ", vlan: "VLAN 20", floor: "2", brand: "HP", model: "Aruba2930", serial: "S1-0002", vendor: "IT Store", date_acquired: "2022-11-08"},
-           {id: 4, name: "AP-1", type: "Access Point", location: "HQ", vlan: "VLAN 20", floor: "3", brand: "Ubiquiti", model: "UAP-AC", serial: "AP-0004", vendor: "Network", date_acquired: "2021-07-30"}
-         ]));
-      }
-
-      // Tickets
+      // 1. Tickets
       const tickets = JSON.parse(localStorage.getItem('client_tickets_v1') || '[]');
       const activeTickets = tickets.filter(t => !['completed', 'closed'].includes((t.status || '').toLowerCase())).length;
       document.getElementById('dashTotalServices').innerText = activeTickets;
@@ -341,21 +318,74 @@
         }).join('');
       }
 
-      // Assets
+      // 2. Systems Monitoring
+      const history = JSON.parse(localStorage.getItem('itdaoms_monitor_history_v1') || '{}');
+      const systemsStatusBody = document.getElementById('systemsStatusBody');
+      const sysNames = Object.keys(history);
+
+      if (sysNames.length > 0) {
+        systemsStatusBody.innerHTML = sysNames.slice(0, 5).map(name => {
+          const stats = history[name];
+          const isUp = stats[stats.length - 1] === 1;
+          const uptime = ((stats.filter(s => s === 1).length / stats.length) * 100).toFixed(1);
+          return `<tr>
+            <td><strong>${escapeHtml(name)}.doe.gov.ph</strong></td>
+            <td>${uptime}% (90d)</td>
+            <td><span class="badge ${isUp ? 'badge-up' : 'badge-down'}">${isUp ? 'UP' : 'DOWN'}</span></td>
+          </tr>`;
+        }).join('');
+
+        // Average Uptime
+        let totalUp = 0;
+        let totalDays = 0;
+        sysNames.forEach(n => {
+          totalUp += history[n].filter(s => s === 1).length;
+          totalDays += history[n].length;
+        });
+        const avgUptime = ((totalUp / totalDays) * 100).toFixed(2);
+        document.getElementById('dashUptime').innerText = avgUptime + '%';
+      }
+
+      // 3. Assets
       const hardware = JSON.parse(localStorage.getItem('hardware_assets_v1') || '[]');
       const software = JSON.parse(localStorage.getItem('software_assets_v1') || '[]');
       document.getElementById('dashTotalAssets').innerText = hardware.length;
       document.getElementById('dashTotalSoftware').innerText = software.length;
 
-      const combinedAssets = [...hardware, ...software].sort((a,b) => b.id - a.id).slice(0, 3);
+      const combinedAssets = [
+        ...hardware.map(h => ({ ...h, category: 'Hardware' })),
+        ...software.map(s => ({ ...s, category: 'Software', brand: s.publisher, model: s.version, date_acquired: s.expiry }))
+      ].sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 3);
+
       const recentAssetsBody = document.getElementById('recentAssetsBody');
       if (combinedAssets.length > 0) {
         recentAssetsBody.innerHTML = combinedAssets.map(a => `<tr>
           <td><strong>${escapeHtml(a.name)}</strong></td>
           <td>${escapeHtml(a.type)}</td>
-          <td>${escapeHtml(a.brand || a.publisher || '—')}</td>
-          <td>${escapeHtml(a.model || a.version || '—')}</td>
-          <td>${escapeHtml(a.date_acquired || a.expiry || '—')}</td>
+          <td>${escapeHtml(a.brand || '—')}</td>
+          <td>${escapeHtml(a.model || '—')}</td>
+          <td>${escapeHtml(a.date_acquired || '—')}</td>
+        </tr>`).join('');
+      }
+
+      // 4. Network Logs
+      const netLogs = JSON.parse(localStorage.getItem('firewall_logs_v1') || '[]');
+      const networkLogsBody = document.getElementById('networkLogsBody');
+      if (netLogs.length > 0) {
+        networkLogsBody.innerHTML = netLogs.slice(-3).reverse().map(l => `<tr>
+          <td>${escapeHtml(l.app || l.src)}</td>
+          <td>${escapeHtml(l.action)}</td>
+          <td><span class="badge ${l.action === 'Allowed' ? 'badge-success' : 'badge-failed'}">${l.action === 'Allowed' ? 'Pass' : 'Block'}</span></td>
+        </tr>`).join('');
+      }
+
+      // 5. Web Postings
+      const postings = JSON.parse(localStorage.getItem('web_postings_v1') || '[]');
+      const webPostingsBody = document.getElementById('webPostingsBody');
+      if (postings.length > 0) {
+        webPostingsBody.innerHTML = postings.slice(-3).reverse().map(p => `<tr>
+          <td><strong>${escapeHtml(p.title)}</strong></td>
+          <td>${escapeHtml(p.date || '—')}</td>
         </tr>`).join('');
       }
     }
@@ -400,6 +430,52 @@
       });
     });
   </script>
+  <script src="sidebar-rbac.js"></script>
+  <script>applySidebarRBAC('dashboard');</script>
+</body>
+
+</html> const parent = btn.parentElement;
+const isOpen = parent.classList.contains('open');
+document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+if (!isOpen) parent.classList.add('open');
+};
+});
+
+// Section Toggling
+document.querySelectorAll('.section-minimize-btn').forEach(btn => {
+btn.onclick = (e) => {
+e.preventDefault();
+const block = btn.closest('.section-block, .inner-section, .stat-grid-header');
+if (!block) return;
+
+let content;
+if (block.classList.contains('section-block')) {
+content = block.querySelector('.section-header').nextElementSibling;
+} else {
+content = btn.closest('h2')?.nextElementSibling;
+}
+
+if (!content) return;
+const isHidden = content.style.display === 'none';
+content.style.display = isHidden ? '' : 'none';
+btn.innerHTML = isHidden ? '<i class="fas fa-minus"></i>' : '<i class="fas fa-plus"></i>';
+};
+});
+
+// 3. Load Data
+try {
+updateDashboardData();
+} catch (e) {
+console.error("Updating dashboard data failed", e);
+}
+}
+
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', init);
+} else {
+init();
+}
+</script>
 </body>
 
 </html>
