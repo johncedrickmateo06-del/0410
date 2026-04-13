@@ -14,8 +14,10 @@
   <style>
     .modal-overlay {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: rgba(0, 0, 0, 0.5);
       z-index: 1000;
       display: flex;
@@ -106,39 +108,39 @@
         <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
         <!-- Services -->
-        <div class="sidebar-dropdown open">
+        <div class="sidebar-dropdown open" id="nav-services-group">
           <button class="dropdown-btn">
             <i class="fas fa-tools"></i> <span>Services</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="services.html">Service Requests</a>
-            <a href="posting.html" class="active">Website Posting Logs</a>
+            <a href="services.html" id="nav-service-requests">Service Requests</a>
+            <a href="posting.html" class="active" id="nav-website-posting">Website Posting Logs</a>
           </div>
         </div>
 
         <!-- Operations Monitoring -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-ops-group">
           <button class="dropdown-btn">
             <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="network.html">Network Monitoring</a>
-            <a href="systems.html">Systems Monitoring</a>
-            <a href="database.html">Database Monitoring</a>
+            <a href="network.html" id="nav-network">Network Monitoring</a>
+            <a href="systems.html" id="nav-systems">Systems Monitoring</a>
+            <a href="database.html" id="nav-database">Database Monitoring</a>
           </div>
         </div>
 
         <!-- Asset Management -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-assets-group">
           <button class="dropdown-btn">
             <i class="fas fa-boxes"></i> <span>Asset Management</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="assets.html">Hardware Assets</a>
-            <a href="softwareasset.html">Software Assets</a>
+            <a href="assets.html" id="nav-hardware">Hardware Assets</a>
+            <a href="softwareasset.html" id="nav-software">Software Assets</a>
           </div>
         </div>
         <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
@@ -188,6 +190,27 @@
             <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
           </div>
         </div>
+
+        <!-- Filters -->
+        <div
+          style="padding:12px 20px; display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; border-bottom:1px solid #e5e7eb;">
+          <div style="position:relative;">
+            <input type="text" id="postSearch" placeholder="Search by article title..." oninput="filterPostings()"
+              style="width:100%; padding:8px 12px 8px 34px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <i class="fas fa-search"
+              style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:12px;"></i>
+          </div>
+          <select id="filterOffice" onchange="filterPostings()"
+            style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px; color:#374151;">
+            <option value="">All Offices</option>
+          </select>
+          <select id="filterStatus" onchange="filterPostings()"
+            style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px; color:#374151;">
+            <option value="">All Statuses</option>
+            <option>Posted</option>
+            <option>Pending</option>
+          </select>
+        </div>
         <div style="overflow-x:auto;">
           <table id="postingTable">
             <thead>
@@ -215,7 +238,8 @@
   <div id="postingModal" class="modal-overlay hidden">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-edit"></i> <span id="modal-title">Web Posting
+        <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-edit"></i> <span id="modal-title">Web
+            Posting
             Detail</span></h3>
         <button class="close-btn" onclick="closePostingModal()">&times;</button>
       </div>
@@ -257,7 +281,8 @@
           <input type="url" id="p-link" placeholder="https://www.doe.gov.ph/...">
         </div>
         <div style="margin-top:16px;">
-          <button class="btn" id="btnSavePosting" onclick="savePosting()"><i class="fas fa-save"></i> Save Posting</button>
+          <button class="btn" id="btnSavePosting" onclick="savePosting()"><i class="fas fa-save"></i> Save
+            Posting</button>
         </div>
       </div>
     </div>
@@ -265,17 +290,26 @@
 
   <script>
     function getPostings() {
-      try { return JSON.parse(localStorage.getItem('itd_webposting_v1') || '[]'); } 
+      try { return JSON.parse(localStorage.getItem('itd_webposting_v1') || '[]'); }
       catch (e) { return []; }
     }
 
-    function renderPostings() {
-      const postings = getPostings();
+    function renderPostings(list = null) {
+      const postings = list || getPostings();
       const body = document.getElementById('postingBody');
-      
+
+      // Update Offices dropdown if initializing
+      if (list === null) {
+        const offices = [...new Set(postings.map(p => p.office).filter(o => o))];
+        const officeSelect = document.getElementById('filterOffice');
+        const currentVal = officeSelect.value;
+        officeSelect.innerHTML = '<option value="">All Offices</option>' + offices.map(o => `<option value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+        officeSelect.value = currentVal;
+      }
+
       if (postings.length === 0) {
         body.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:24px;">No posting records found.</td></tr>';
-        updateStats(postings);
+        if (list === null) updateStats(postings);
         return;
       }
 
@@ -300,18 +334,34 @@
           </td>
         </tr>
       `).join('');
-      
-      updateStats(postings);
+
+      if (list === null) updateStats(postings);
+    }
+
+    function filterPostings() {
+      const searchTerm = document.getElementById('postSearch').value.toLowerCase();
+      const officeFilter = document.getElementById('filterOffice').value;
+      const statusFilter = document.getElementById('filterStatus').value;
+
+      const all = getPostings();
+      const filtered = all.filter(p => {
+        const matchesSearch = p.title.toLowerCase().includes(searchTerm);
+        const matchesOffice = !officeFilter || p.office === officeFilter;
+        const matchesStatus = !statusFilter || p.status === statusFilter;
+        return matchesSearch && matchesOffice && matchesStatus;
+      });
+
+      renderPostings(filtered);
     }
 
     function updateStats(data) {
       const total = data.length;
       const posted = data.filter(p => p.status === 'Posted').length;
       const pending = data.filter(p => p.status === 'Pending').length;
-      
+
       // Calculate top office
       const officeCounts = {};
-      data.forEach(p => { if(p.office) officeCounts[p.office] = (officeCounts[p.office] || 0) + 1; });
+      data.forEach(p => { if (p.office) officeCounts[p.office] = (officeCounts[p.office] || 0) + 1; });
       let topOffice = '—';
       let maxCount = 0;
       for (const [off, count] of Object.entries(officeCounts)) {
@@ -345,7 +395,7 @@
       const title = document.getElementById('p-title').value.trim();
       const office = document.getElementById('p-office').value.trim();
       const dateRec = document.getElementById('p-date-rec').value;
-      
+
       if (!title || !office || !dateRec) {
         alert("Please fill in all mandatory fields (Title, Office, Received Date).");
         return;
@@ -414,21 +464,21 @@
       document.body.removeChild(a);
     }
 
-    function escapeHtml(s) { 
-      return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); 
+    function escapeHtml(s) {
+      return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     // Initialize
     window.addEventListener('DOMContentLoaded', () => {
       renderPostings();
-      
+
       // Auto-set Posted Date to today if Status is changed to Posted
-      document.getElementById('p-status').addEventListener('change', function() {
+      document.getElementById('p-status').addEventListener('change', function () {
         if (this.value === 'Posted' && !document.getElementById('p-date-post').value) {
           document.getElementById('p-date-post').value = new Date().toISOString().split('T')[0];
         }
       });
-      
+
       // Section Minimize logic
       document.querySelectorAll('.section-minimize-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -449,5 +499,50 @@
       });
     });
   </script>
+  <script src="sidebar-rbac.js"></script>
+  <script>applySidebarRBAC('website_posting');</script>
 </body>
+
+</html>
+
+</html>
+`;
+reportWin.document.write(html);
+reportWin.document.close();
+}
+
+// Initialize
+window.addEventListener('DOMContentLoaded', () => {
+checkPermissions();
+renderPostings();
+
+// Auto-set Posted Date to today if Status is changed to Posted
+document.getElementById('p-status').addEventListener('change', function() {
+if (this.value === 'Posted' && !document.getElementById('p-date-post').value) {
+document.getElementById('p-date-post').value = new Date().toISOString().split('T')[0];
+}
+});
+
+// Section Minimize logic
+document.querySelectorAll('.section-minimize-btn').forEach(btn => {
+btn.addEventListener('click', () => {
+const block = btn.closest('.section-block');
+block.classList.toggle('collapsed');
+btn.innerHTML = block.classList.contains('collapsed') ? '<i class="fas fa-plus"></i>' : '<i class="fas fa-minus"></i>';
+});
+});
+
+// Sidebar Dropdown Toggle
+document.querySelectorAll('.dropdown-btn').forEach(btn => {
+btn.addEventListener('click', () => {
+const parent = btn.parentElement;
+const isOpen = parent.classList.contains('open');
+document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+if (!isOpen) parent.classList.add('open');
+});
+});
+});
+</script>
+</body>
+
 </html>
