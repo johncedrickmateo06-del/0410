@@ -1,263 +1,727 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Systems Monitoring – ITD AOMS</title>
-  <meta name="description" content="ITD Asset & Operations Monitoring System – Systems Monitoring">
+  <meta name="description" content="ITD Asset & Operations Monitoring System – Automated Systems Monitoring">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
   <style>
-    .uptime-table th, .uptime-table td { font-size: 12px; padding: 8px 10px; }
-    .uptime-table select { padding: 4px 6px; font-size: 12px; width: 100%; min-width: 70px; }
-    .status-up { background: #d1fae5; color: #065f46; font-weight: 600; border-radius: 4px; }
-    .status-down { background: #fee2e2; color: #991b1b; font-weight: 600; border-radius: 4px; }
-    .status-partial { background: #fef3c7; color: #92400e; font-weight: 600; border-radius: 4px; }
-    .section-block { overflow-x: auto; }
+    :root {
+      --success-green: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.1);
+      --warning-yellow: #f59e0b;
+      --error-red: #ef4444;
+      --neutral-gray: #e5e7eb;
+    }
+
+    /* Status Banner */
+    .status-banner {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-banner.all-up {
+      border-left: 6px solid var(--success-green);
+    }
+
+    .status-banner.some-down {
+      border-left: 6px solid var(--warning-yellow);
+    }
+
+    .status-banner.all-down {
+      border-left: 6px solid var(--error-red);
+    }
+
+    .status-icon-large {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .all-up .status-icon-large {
+      background: var(--success-bg);
+      color: var(--success-green);
+      box-shadow: 0 0 15px var(--success-bg);
+    }
+
+    .some-down .status-icon-large {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning-yellow);
+    }
+
+    .status-text h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .status-text p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    /* Monitoring Grid */
+    .monitor-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .monitor-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 18px 24px;
+      border: 1px solid var(--border);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .monitor-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .monitor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .monitor-info h3 {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+    }
+
+    .monitor-info .monitor-url {
+      font-size: 12px;
+      color: var(--text-label);
+      font-family: monospace;
+    }
+
+    .status-badge-live {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-badge-live.up {
+      background: var(--success-bg);
+      color: var(--success-green);
+    }
+
+    .status-badge-live.down {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error-red);
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse-animation 2s infinite;
+    }
+
+    @keyframes pulse-animation {
+      0% {
+        box-shadow: 0 0 0 0px rgba(16, 185, 129, 0.4);
+      }
+
+      70% {
+        box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+      }
+
+      100% {
+        box-shadow: 0 0 0 0px rgba(16, 185, 129, 0);
+      }
+    }
+
+    /* Uptime Bar */
+    .uptime-bar-container {
+      display: flex;
+      gap: 3px;
+      height: 32px;
+      margin-bottom: 8px;
+    }
+
+    .uptime-block {
+      flex: 1;
+      height: 100%;
+      background: var(--success-green);
+      border-radius: 2px;
+      opacity: 0.8;
+      transition: opacity 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .uptime-block:hover {
+      opacity: 1;
+      transform: scaleY(1.1);
+    }
+
+    .uptime-block.down {
+      background: var(--error-red);
+    }
+
+    .uptime-block.partial {
+      background: var(--warning-yellow);
+    }
+
+    .uptime-block.no-data {
+      background: var(--neutral-gray);
+    }
+
+    .uptime-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* Responsive Grid */
+    @media (min-width: 1024px) {
+      .monitor-grid {
+        grid-template-columns: 1fr;
+      }
+
+      /* Keeping stack view for full width lines like UptimeRobot */
+    }
+
+    /* Tooltip simulation (simple titles for now) */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    .uptime-stats-row {
+      display: flex;
+      gap: 24px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f3f4f6;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label-small {
+      font-size: 10px;
+      color: var(--text-label);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .stat-value-small {
+      font-size: 14px;
+      color: var(--navy);
+      font-weight: 700;
+    }
   </style>
 </head>
+
 <body>
-<div class="layout">
+  <div class="layout">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-brand">
-      <div class="brand-logos">
-        <img src="DOE LOGO.png" alt="DOE">
-        <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
-        <div style="margin-left:4px;">
-          <div style="font-size:8px;color:rgba(255,255,255,0.5);line-height:1.3;">Department of Energy<br>Information Technology Division</div>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logos">
+          <img src="DOE LOGO.png" alt="DOE">
+          <img src="Bagong_Pilipinas_logo.png" alt="Bagong Pilipinas">
+          <div style="margin-left:4px;">
+            <div style="font-size:8px;color:rgba(255,255,255,0.5);line-height:1.3;">Department of Energy<br>Information
+              Technology Division</div>
+          </div>
+        </div>
+        <div class="brand-title">ITD</div>
+        <div class="brand-sub">Asset &amp; Operations<br>Monitoring System</div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-tools"></i> <span>Services</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="services.html">Service Requests</a>
+            <a href="posting.html">Website Posting Logs</a>
+          </div>
+        </div>
+
+        <div class="sidebar-dropdown open">
+          <button class="dropdown-btn">
+            <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="network.html">Network Monitoring</a>
+            <a href="systems.html" class="active">Systems Monitoring</a>
+            <a href="database.html">Database Monitoring</a>
+          </div>
+        </div>
+
+        <div class="sidebar-dropdown">
+          <button class="dropdown-btn">
+            <i class="fas fa-boxes"></i> <span>Asset Management</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </button>
+          <div class="sidebar-submenu">
+            <a href="assets.html">Hardware Assets</a>
+            <a href="softwareasset.html">Software Assets</a>
+          </div>
+        </div>
+        <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
+      </nav>
+      <div class="sidebar-user">
+        <div class="signed-label">Signed in as</div>
+        <div class="user-name">Gerald Balbon</div>
+        <a href="front.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h1 class="page-title" style="margin-bottom:0;">Systems Monitoring</h1>
+        <div style="font-size:12px; color:var(--text-muted); font-weight:500;">
+          <i class="fas fa-sync-alt" id="refresh-icon" style="margin-right:4px;"></i>
+          Last check: <span id="last-update">Just now</span>
         </div>
       </div>
-      <div class="brand-title">ITD</div>
-      <div class="brand-sub">Asset &amp; Operations<br>Monitoring System</div>
-    </div>
-    <nav class="sidebar-nav">
-      <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
-      
-      <!-- Services -->
-      <div class="sidebar-dropdown">
-        <button class="dropdown-btn">
-          <i class="fas fa-tools"></i> <span>Services</span>
-          <i class="fas fa-chevron-down chevron"></i>
-        </button>
-        <div class="sidebar-submenu">
-          <a href="services.html">Service Requests</a>
 
-          <a href="posting.html">Website Posting Logs</a>
+      <!-- Overall Status Banner -->
+      <div id="status-banner" class="status-banner all-up">
+        <div class="status-icon-large">
+          <i class="fas fa-check-circle" id="banner-icon"></i>
+        </div>
+        <div class="status-text">
+          <h2 id="banner-title">All Systems Operational</h2>
+          <p id="banner-sub">Automated checks are performed every 5 minutes. All 12 systems are responding within normal
+            parameters.</p>
         </div>
       </div>
 
-      <!-- Operations Monitoring -->
-      <div class="sidebar-dropdown open">
-        <button class="dropdown-btn">
-          <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
-          <i class="fas fa-chevron-down chevron"></i>
-        </button>
-        <div class="sidebar-submenu">
-          <a href="network.html">Network Monitoring</a>
-          <a href="systems.html" class="active">Systems Monitoring</a>
-          <a href="database.html">Database Monitoring</a>
+      <!-- Systems Grid -->
+      <div class="monitor-grid">
+        <!-- 1 -->
+        <div class="monitor-card" data-system="comsv2">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>comsv2.doe.gov.ph</h3>
+              <span class="monitor-url">https://comsv2.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-comsv2"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-comsv2">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 2 -->
+        <div class="monitor-card" data-system="de">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>de.doe.gov.ph</h3>
+              <span class="monitor-url">https://de.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-de"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-de">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 3 -->
+        <div class="monitor-card" data-system="depdms">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>depdms.doe.gov.ph</h3>
+              <span class="monitor-url">https://depdms.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-depdms"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-depdms">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 4 -->
+        <div class="monitor-card" data-system="doe">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>doe.gov.ph</h3>
+              <span class="monitor-url">https://www.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-doe"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-doe">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 5 -->
+        <div class="monitor-card" data-system="ertls">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>ertls-osms.doe.gov.ph</h3>
+              <span class="monitor-url">https://ertls-osms.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-ertls"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-ertls">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 6 -->
+        <div class="monitor-card" data-system="gea">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>gea.doe.gov.ph</h3>
+              <span class="monitor-url">https://gea.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-gea"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-gea">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 7 -->
+        <div class="monitor-card" data-system="gemp">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>gemp.doe.gov.ph</h3>
+              <span class="monitor-url">https://gemp.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-gemp"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-gemp">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 8 -->
+        <div class="monitor-card" data-system="hrips">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>hrips.doe.gov.ph</h3>
+              <span class="monitor-url">https://hrips.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-hrips"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-hrips">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 9 -->
+        <div class="monitor-card" data-system="pelp">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>prod-pelp.doe.gov.ph</h3>
+              <span class="monitor-url">https://prod-pelp.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-pelp"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-pelp">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 10 -->
+        <div class="monitor-card" data-system="legacy">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>legacy.doe.gov.ph</h3>
+              <span class="monitor-url">https://legacy.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-legacy"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-legacy">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 11 -->
+        <div class="monitor-card" data-system="nedr">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>nedr.doe.gov.ph</h3>
+              <span class="monitor-url">https://nedr.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-nedr"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-nedr">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+        <!-- 12 -->
+        <div class="monitor-card" data-system="vfelp">
+          <div class="monitor-header">
+            <div class="monitor-info">
+              <h3>vfelp.doe.gov.ph</h3>
+              <span class="monitor-url">https://vfelp.doe.gov.ph/</span>
+            </div>
+            <div class="status-badge-live up">
+              <span class="pulse"></span> Operational
+            </div>
+          </div>
+          <div class="uptime-bar-container" id="bar-vfelp"></div>
+          <div class="uptime-footer">
+            <span>90 days ago</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span id="percent-vfelp">100% uptime</span>
+            <span style="border-top:1px dashed #d1d5db; flex:1; margin: 8px 10px 0;"></span>
+            <span>Today</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Overall Incidents / Log -->
+      <div class="section-block" style="margin-top:40px;">
+        <div class="section-header">
+          <h2><i class="fas fa-history" style="margin-right:8px;color:#0d1b6e;"></i>Overall Status History</h2>
+        </div>
+        <div style="padding:20px; text-align:center; color:var(--text-muted); font-size:14px;">
+          <i class="fas fa-check-circle"
+            style="color:var(--success-green); font-size:32px; display:block; margin-bottom:12px;"></i>
+          No incidents reported in the last 30 days.
         </div>
       </div>
 
-      <!-- Asset Management -->
-      <div class="sidebar-dropdown">
-        <button class="dropdown-btn">
-          <i class="fas fa-boxes"></i> <span>Asset Management</span>
-          <i class="fas fa-chevron-down chevron"></i>
-        </button>
-        <div class="sidebar-submenu">
-          <a href="assets.html">Hardware Assets</a>
-          <a href="softwareasset.html">Software Assets</a>
-        </div>
-      </div>
-      <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
-    </nav>
-    <div class="sidebar-user">
-      <div class="signed-label">Signed in as</div>
-      <div class="user-name">Gerald Balbon</div>
-      <a href="front.html" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Log out</a>
-    </div>
-  </aside>
+    </main>
+  </div>
 
-  <!-- MAIN -->
-  <main class="main-content">
-    <h1 class="page-title">Systems Monitoring</h1>
+  <script>
+    const SYSTEMS = ['comsv2', 'de', 'depdms', 'doe', 'ertls', 'gea', 'gemp', 'hrips', 'pelp', 'legacy', 'nedr', 'vfelp'];
 
-    <!-- Daily Uptime Log -->
-    <div class="section-block" style="margin-bottom:16px;">
-      <div class="section-header">
-        <h2><i class="fas fa-chart-line" style="margin-right:8px;color:#0d1b6e;"></i>Daily Uptime Log</h2>
-        <div style="display:flex; align-items:center; gap:10px;">
-          <button class="btn btn-sm" onclick="computeUptime()"><i class="fas fa-calculator"></i> Compute</button>
-          <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
-        </div>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="uptime-table">
-          <thead>
-            <tr>
-              <th>Date</th><th>Day</th>
-              <th>comsv2</th><th>de</th><th>depdms</th><th>doe</th>
-              <th>ertls</th><th>gea</th><th>gemp</th><th>hrips</th>
-              <th>pelp</th><th>legacy</th><th>nedr</th><th>vfelp</th>
-              <th># UP</th><th># DOWN</th><th>Uptime %</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><input type="date" id="date" style="min-width:130px;"></td>
-              <td><input type="text" id="day" placeholder="Mon" style="width:60px;"></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td><select class="status"><option>UP</option><option>DOWN</option><option>PARTIAL</option></select></td>
-              <td id="upCount" style="font-weight:700;color:#065f46;">0</td>
-              <td id="downCount" style="font-weight:700;color:#991b1b;">0</td>
-              <td id="uptimePercent" style="font-weight:700;">0%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    // Persistence Key
+    const HISTORY_KEY = 'itdaoms_monitor_history_v1';
 
-    <!-- Monthly Breakdown -->
-    <div class="section-block" style="margin-bottom:16px;">
-      <div class="section-header">
-        <h2><i class="fas fa-calendar-alt" style="margin-right:8px;color:#0d1b6e;"></i>Monthly Uptime Breakdown</h2>
-        <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="uptime-table">
-          <thead>
-            <tr>
-              <th>Month</th><th>Days Monitored</th>
-              <th>comsv2</th><th>de</th><th>depdms</th><th>doe</th><th>...</th>
-              <th>Total DOWN Days</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><input type="month"></td>
-              <td><input type="number" placeholder="0" style="width:70px;"></td>
-              <td><input type="number" placeholder="UP days" style="width:80px;"></td>
-              <td><input type="number" style="width:60px;"></td>
-              <td><input type="number" style="width:60px;"></td>
-              <td><input type="number" style="width:60px;"></td>
-              <td style="color:#9ca3af;">...</td>
-              <td><input type="number" style="width:80px;"></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    function initMonitorData() {
+      let history = JSON.parse(localStorage.getItem(HISTORY_KEY));
+      if (!history) {
+        history = {};
+        const now = new Date();
+        SYSTEMS.forEach(sys => {
+          // Create 90 days of random-ish healthy data
+          history[sys] = Array.from({ length: 90 }, () => Math.random() > 0.98 ? 0 : 1);
+        });
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+      }
+      return history;
+    }
 
-    <!-- Status Report -->
-    <div class="section-block">
-      <div class="section-header">
-        <h2><i class="fas fa-file-alt" style="margin-right:8px;color:#0d1b6e;"></i>Monitoring Status Report</h2>
-        <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
-      </div>
-      <div style="overflow-x:auto;">
-        <table class="uptime-table">
-          <thead>
-            <tr>
-              <th>Service</th><th>Uptime %</th><th>Downtime %</th>
-              <th>Uptime (hrs)</th><th>Downtime (hrs)</th>
-              <th>Uptime (min)</th><th>Downtime (min)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>doe.gov.ph</strong></td>
-              <td><input type="number" style="width:70px;"></td>
-              <td><input type="number" style="width:70px;"></td>
-              <td><input type="number" style="width:70px;"></td>
-              <td><input type="number" style="width:70px;"></td>
-              <td><input type="number" style="width:70px;"></td>
-              <td><input type="number" style="width:70px;"></td>
-            </tr>
-            <tr>
-              <td><strong>AVERAGE / TOTAL</strong></td>
-              <td colspan="6" style="color:#9ca3af;font-style:italic;">—</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    function renderBars() {
+      const history = initMonitorData();
+      SYSTEMS.forEach(sys => {
+        const container = document.getElementById(`bar-${sys}`);
+        const data = history[sys];
+        if (!container) return;
 
-  </main>
-</div>
+        container.innerHTML = '';
+        data.forEach((status, idx) => {
+          const block = document.createElement('div');
+          block.className = 'uptime-block';
+          if (status === 0) block.className += ' down';
 
-<script>
-function computeUptime() {
-  const statuses = document.querySelectorAll(".status");
-  let up = 0, down = 0;
-  statuses.forEach(s => {
-    if (s.value === "UP") up++;
-    if (s.value === "DOWN") down++;
-  });
-  const total = statuses.length;
-  const percent = ((up / total) * 100).toFixed(2);
-  document.getElementById("upCount").innerText = up;
-  document.getElementById("downCount").innerText = down;
-  document.getElementById("uptimePercent").innerText = percent + "%";
-}
+          // Tooltip detail
+          const date = new Date();
+          date.setDate(date.getDate() - (89 - idx));
+          const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+          block.title = `${dateStr}: ${status === 1 ? 'Operational' : 'Down (Maintenance)'}`;
 
-// RBAC: Hide User Management for non-admins
-const userRole = localStorage.getItem('role');
-if (userRole !== 'Admin') {
-  const navUsers = document.getElementById('nav-users');
-  if (navUsers) navUsers.style.display = 'none';
-}
+          container.appendChild(block);
+        });
 
-// Section Toggling (accordion for section-blocks; stat-cards are independent)
-document.querySelectorAll('.section-minimize-btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const card = btn.closest('.section-block, .inner-section');
-    const isCollapsed = card.classList.contains('collapsed');
-
-    if (card.classList.contains('section-block') || card.classList.contains('inner-section')) {
-      // Accordion: collapse all other section-blocks first
-      document.querySelectorAll('.section-block, .inner-section').forEach(block => {
-        if (block !== card) {
-          block.classList.add('collapsed');
-          const otherIcon = block.querySelector('.section-minimize-btn i');
-          if (otherIcon) otherIcon.className = 'fas fa-plus';
-        }
+        // Calculate percentage
+        const upDays = data.filter(s => s === 1).length;
+        const percent = ((upDays / 90) * 100).toFixed(2);
+        document.getElementById(`percent-${sys}`).innerText = `${percent}% uptime`;
       });
     }
 
-    // Toggle the clicked card
-    card.classList.toggle('collapsed');
-    const icon = btn.querySelector('i');
-    icon.className = card.classList.contains('collapsed') ? 'fas fa-plus' : 'fas fa-minus';
-  });
-});
+    function simulateCheck() {
+      document.getElementById('refresh-icon').classList.add('fa-spin');
 
-// Sidebar Dropdown Toggle (accordion – only one open at a time)
-document.querySelectorAll('.dropdown-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const parent = btn.parentElement;
-    const isOpen = parent.classList.contains('open');
-    // Close ALL dropdowns first
-    document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
-    // Only open the clicked one if it was previously closed
-    if (!isOpen) parent.classList.add('open');
-  });
-});
-</script>
+      // Smooth delay for "checking" effect
+      setTimeout(() => {
+        document.getElementById('refresh-icon').classList.remove('fa-spin');
+        const now = new Date();
+        document.getElementById('last-update').innerText = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        // Update the "Today" (last) block in history randomly for demo
+        let history = JSON.parse(localStorage.getItem(HISTORY_KEY));
+        let anyFailure = false;
+
+        SYSTEMS.forEach(sys => {
+          const currentData = history[sys];
+          // 99% chance of being UP in this simulation check
+          const isUp = Math.random() > 0.01;
+          currentData[89] = isUp ? 1 : 0;
+          if (!isUp) anyFailure = true;
+        });
+
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+        updateBanner(anyFailure);
+        renderBars();
+      }, 1200);
+    }
+
+    function updateBanner(anyFailure) {
+      const banner = document.getElementById('status-banner');
+      const icon = document.getElementById('banner-icon');
+      const title = document.getElementById('banner-title');
+      const sub = document.getElementById('banner-sub');
+
+      if (anyFailure) {
+        banner.className = 'status-banner some-down';
+        icon.className = 'fas fa-exclamation-triangle';
+        title.innerText = 'Service Interruption Detected';
+        sub.innerText = 'One or more systems are experiencing degraded performance or downtime. Our team is investigating.';
+      } else {
+        banner.className = 'status-banner all-up';
+        icon.className = 'fas fa-check-circle';
+        title.innerText = 'All Systems Operational';
+        sub.innerText = 'Automated checks are performed every 5 minutes. All 12 systems are responding within normal parameters.';
+      }
+    }
+
+    // Auto-run simulation
+    setInterval(simulateCheck, 300000); // Every 5 mins realistically
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initMonitorData();
+      renderBars();
+
+      // Optional: click to manually refresh
+      document.getElementById('refresh-icon').parentElement.style.cursor = 'pointer';
+      document.getElementById('refresh-icon').parentElement.onclick = simulateCheck;
+    });
+
+    // Sidebar Dropdown Toggle
+    document.querySelectorAll('.dropdown-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const parent = btn.parentElement;
+        const isOpen = parent.classList.contains('open');
+        document.querySelectorAll('.sidebar-dropdown').forEach(d => d.classList.remove('open'));
+        if (!isOpen) parent.classList.add('open');
+      });
+    });
+  </script>
 </body>
+
 </html>
