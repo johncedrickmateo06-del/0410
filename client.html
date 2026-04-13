@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Client Service Requests – ITD AOMS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── Top Bar ── */
+    .client-topbar {
+      background: var(--navy, #0d1b6e);
+      color: #fff;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.3px;
+    }
+
+    .topbar-brand i {
+      font-size: 17px;
+      opacity: 0.85;
+    }
+
+    .topbar-user {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .user-info-pill {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 6px 14px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .user-name-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .user-meta-label {
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.3;
+    }
+
+    .logout-btn-top {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      font-size: 12.5px;
+      font-weight: 500;
+      font-family: 'Inter', Arial, sans-serif;
+      padding: 7px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+    }
+
+    .logout-btn-top:hover {
+      background: rgba(255, 255, 255, 0.22);
+    }
+
+    /* ── Page Layout ── */
+    .client-wrap {
+      max-width: 1000px;
+      margin: 32px auto;
+      padding: 0 20px 40px;
+    }
+
+    .page-heading {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 20px;
+      letter-spacing: -0.4px;
+    }
+
+    /* ── Access Denied ── */
+    .notice {
+      padding: 18px;
+      background: #fff3cd;
+      border: 1px solid #ffeeba;
+      border-radius: 8px;
+      color: #856404;
+    }
+
+    /* ── Ticket Form ── */
+    .ticket-form {
+      background: #fff;
+      padding: 24px 28px;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .ticket-form h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1a1a2e;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ticket-form h3 i {
+      color: #0d1b6e;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-grid .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-field label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      padding: 9px 12px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: 'Inter', Arial, sans-serif;
+      color: #1a1a2e;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: #0d1b6e;
+      box-shadow: 0 0 0 3px rgba(13, 27, 110, 0.08);
+    }
+
+    .form-field input[readonly] {
+      background: #f9fafb;
+      color: #6b7280;
+      cursor: default;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    /* ── Table ── */
+    .section-block {
+      margin-top: 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body style="background:#f0ede6; margin:0; font-family:'Inter',Arial,sans-serif;">
+
+  <!-- TOP BAR -->
+  <div class="client-topbar">
+    <div class="topbar-brand">
+      <i class="fas fa-clipboard-list"></i>
+      ITD AOMS – Client Portal
+    </div>
+    <div class="topbar-user">
+      <div class="user-info-pill">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-details">
+          <span class="user-name-label" id="topbarName">—</span>
+          <span class="user-meta-label" id="topbarMeta">—</span>
+        </div>
+      </div>
+      <a href="front.html" class="logout-btn-top" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i> Log out
+      </a>
+    </div>
+  </div>
+
+  <div class="client-wrap">
+    <h1 class="page-heading">Client Service Requests</h1>
+
+    <!-- Access Denied -->
+    <div id="accessDenied" class="notice hidden">
+      You are not authorized to view this page. Only users signing in as <strong>Client</strong> can create and view
+      service requests.
+      <div style="margin-top:8px;"><a href="front.html">Return to login</a> or <a href="dashboard.html">Go to
+          Dashboard</a></div>
+    </div>
+
+    <!-- Client Area -->
+    <div id="clientArea" class="hidden">
+
+      <!-- Form -->
+      <div class="ticket-form">
+        <h3><i class="fas fa-paper-plane"></i> Create Service Request</h3>
+
+        <div class="form-grid">
+
+          <!-- Name -->
+          <div class="form-field">
+            <label>Name</label>
+            <input type="text" id="fieldName" placeholder="Enter your full name">
+          </div>
+
+          <!-- Bureau/Services -->
+          <div class="form-field">
+            <label>Bureau/Services</label>
+            <select id="fieldDept" onchange="updateDivisionDropdown()">
+              <option value="">Select Bureau...</option>
+            </select>
+          </div>
+
+          <!-- Division -->
+          <div class="form-field">
+            <label>Division</label>
+            <select id="fieldDivision">
+              <option value="">Select Division...</option>
+            </select>
+          </div>
+
+          <!-- Service Type -->
+          <div class="form-field">
+            <label>Service Type</label>
+            <select id="svcType">
+              <option>EMAIL</option>
+              <option>ICT INFRASTRUCTURE SYSTEMS</option>
+              <option>INFORMATION SYSTEMS AND DATABASES</option>
+              <option>NETWORK SYSTEMS</option>
+              <option>WORKSTATIONS AND PERIPHERALS </option>
+              <option>USER ACCOUNT CREATION</option>
+              <option>USER ACCOUNT MODIFICATION</option>
+              <option>USER ACCOUNT DEACTIVATION</option>
+              <option>PASSWORD RESETTING</option>
+            </select>
+          </div>
+
+          <!-- Description (full width) -->
+          <div class="form-field full-width">
+            <label>Description</label>
+            <textarea id="description" rows="3" placeholder="Describe your request…"></textarea>
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+          <button class="btn" onclick="submitTicket()"><i class="fas fa-paper-plane"></i> Submit Request</button>
+          <button class="btn btn-sm" style="background:#6b7280;" onclick="clearForm()">Clear</button>
+        </div>
+      </div>
+
+      <!-- My Requests Table -->
+      <div class="section-block">
+        <div class="section-header">
+          <h2><i class="fas fa-list-alt" style="margin-right:8px;color:#0d1b6e;"></i>My Requests</h2>
+        </div>
+        <div style="overflow-x:auto;">
+          <table id="ticketTable" style="min-width:780px;">
+            <thead>
+              <tr>
+                <th>Control No.</th>
+                <th>Name</th>
+                <th>Division</th>
+                <th>Department</th>
+                <th>Type</th>
+                <th>Priority</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th style="width: 60px; text-align: center;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ticketBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /clientArea -->
+  </div>
+
+  <script>
+    // ── Auth helpers ──────────────────────────────────
+    function getRole() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('role') || localStorage.getItem('role') || '';
+    }
+
+    function logout() {
+      localStorage.removeItem('role');
+      localStorage.removeItem('client_name');
+      localStorage.removeItem('client_division');
+      localStorage.removeItem('client_dept');
+    }
+
+    function showAccess(allowed) {
+      document.getElementById('clientArea').classList.toggle('hidden', !allowed);
+      document.getElementById('accessDenied').classList.toggle('hidden', allowed);
+    }
+
+    // ── Organizational Data ──────────────────────────
+    const ORGANIZATIONAL_DATA = {
+      "AS": ["AS", "AS-GSD", "AS-HRMD", "AS-OD", "AS-PMD", "AS-TD"],
+      "EPIMB": ["EPIMB", "EPIMB-EMPDD", "EPIMB-OD", "EPIMB-PMDD", "EPIMB-PPDD"],
+      "EPPB": ["EPPB", "EPPB-ECCD", "EPPB-OD", "EPPB-PD", "EPPB-PFRD"],
+      "ERDB": ["ERDB", "ERDB-CNMD", "ERDB-OD", "ERDB-PRDD"],
+      "ERTLS": ["ERTLS", "ERTLS-GRFTLD", "ERTLS-LATD", "ERTLS-OD"],
+      "EUMB": ["EUMB", "EUMB-AFETD", "EUMB-EMPDD", "EUMB-EPRED", "EUMB-EPSMD", "EUMB-EVIMD", "EUMB-NED", "EUMB-OD"],
+      "FS": ["FS", "FS-AD", "FS-BD", "FS-CERCD", "FS-OD", "FS-PCD", "FS-RERCD"],
+      "ITMS": ["ITMS", "ITMS-IDMD", "ITMS-ISD", "ITMS-ITD", "ITMS-OD"],
+      "LFO": ["LFO", "LFO-EPIMD", "LFO-ERDD", "LFO-EUMD", "LFO-OD", "LFO-OIMD"],
+      "LS": ["LS", "LS-DCELSD", "LS-GLSD", "LS-OD", "LS-PLSD", "LS-RELSD", "LS-UCELSD"],
+      "MFO": ["MFO", "MFO-EPIMD", "MFO-ERDD", "MFO-EUMD", "MFO-OD", "MFO-OIMD"],
+      "OIMB": ["OIMB", "OIMB-NGMD", "OIMB-OD", "OIMB-OICMD", "OIMB-OISMD", "OIMB-RMMSCD"],
+      "OSEC": ["OSEC", "OSEC-ACAN", "OSEC-AOS", "OSEC-CWPO", "OSEC-FWBF", "OSEC-GCJB", "OSEC-IAD", "OSEC-IPO", "OSEC-MCC", "OSEC-MCM", "OSEC-MFFR", "OSEC-PAO", "OSEC-RCLG", "OSEC-RVC"],
+      "REMB": ["REMB", "REMB-BEMD", "REMB-GEMD", "REMB-HOEMD", "REMB-NREB-TSMD", "REMB-OD", "REMB-SEMD", "REMB-TSMD", "REMB-WEMD"],
+      "VFO": ["VFO", "VFO-EIMD", "VFO-EPIMD", "VFO-ERDD", "VFO-ERDUD", "VFO-EUMD", "VFO-OD", "VFO-OIMD"]
+    };
+
+    function updateDivisionDropdown(selectedDivision = "") {
+      const deptVal = document.getElementById('fieldDept').value;
+      const divSelect = document.getElementById('fieldDivision');
+      divSelect.innerHTML = '<option value="">Select Division...</option>';
+
+      if (deptVal && ORGANIZATIONAL_DATA[deptVal]) {
+        ORGANIZATIONAL_DATA[deptVal].forEach(div => {
+          const opt = document.createElement('option');
+          opt.value = div;
+          opt.textContent = div;
+          divSelect.appendChild(opt);
+        });
+      }
+      if (selectedDivision) divSelect.value = selectedDivision;
+    }
+
+    // ── Init ──────────────────────────────────────────
+    (function init() {
+      const role = getRole();
+      if (role) localStorage.setItem('role', role);
+
+      const isClient = role && role.toLowerCase() === 'client';
+      showAccess(isClient);
+
+      if (isClient) {
+        // Populate Dept dropdown
+        const deptSelect = document.getElementById('fieldDept');
+        Object.keys(ORGANIZATIONAL_DATA).sort().forEach(dept => {
+          const opt = document.createElement('option');
+          opt.value = opt.textContent = dept;
+          deptSelect.appendChild(opt);
+        });
+
+        // Pull profile from localStorage
+        const name = localStorage.getItem('client_name') || 'Client User';
+        const division = localStorage.getItem('client_division') || '';
+        const dept = localStorage.getItem('client_dept') || '';
+
+        // Pre-fill fields
+        document.getElementById('fieldName').value = name;
+        if (dept) {
+          document.getElementById('fieldDept').value = dept;
+          updateDivisionDropdown(division);
+        }
+
+        // Top bar
+        document.getElementById('topbarName').textContent = name;
+        document.getElementById('topbarMeta').textContent = (division || '—') + ' · ' + (dept || '—');
+        document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
+
+        renderTickets();
+      }
+    })();
+
+    // ── Ticket storage ────────────────────────────────
+    function ticketStoreKey() { return 'client_tickets_v1'; }
+    function loadTickets() {
+      try { return JSON.parse(localStorage.getItem(ticketStoreKey()) || '[]'); } catch (e) { return []; }
+    }
+    function saveTickets(t) { localStorage.setItem(ticketStoreKey(), JSON.stringify(t)); }
+
+    // ── Submit ────────────────────────────────────────
+    function submitTicket() {
+      const name = document.getElementById('fieldName').value.trim();
+      const division = document.getElementById('fieldDivision').value.trim();
+      const dept = document.getElementById('fieldDept').value.trim();
+      const svc = document.getElementById('svcType').value;
+      const desc = document.getElementById('description').value.trim();
+
+      if (!name) { alert('Please enter your name.'); return; }
+      if (!desc) { alert('Please enter a description.'); return; }
+
+      const isConfirmed = window.confirm("Are you sure you want to submit this request?\n\nPlease note: The details cannot be changed once the request is submitted.");
+      if (!isConfirmed) {
+        return;
+      }
+
+      const tickets = loadTickets();
+      const id = 'T' + Date.now();
+
+      // Control number: YYYY-MM-XXX
+      const now = new Date();
+      const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const monthlyCount = tickets.filter(t => {
+        try { return new Date(t.created).toISOString().slice(0, 7) === ym; } catch (e) { return false; }
+      }).length;
+      const ctrl = `${ym}-${String(monthlyCount + 1).padStart(3, '0')}`;
+
+      tickets.unshift({
+        control_no: ctrl, id,
+        name, division, dept,
+        type: svc, priority: 'Normal',
+        description: desc,
+        status: 'Open',
+        created: now.toISOString()
+      });
+      saveTickets(tickets);
+      clearForm();
+      alert('Your service request has been successfully submitted!\nControl Number: ' + ctrl);
+      renderTickets();
+    }
+
+    function clearForm() {
+      document.getElementById('description').value = '';
+      document.getElementById('svcType').selectedIndex = 0;
+    }
+
+    // ── Render table ──────────────────────────────────
+    function renderTickets() {
+      const body = document.getElementById('ticketBody');
+      const tickets = loadTickets();
+      if (!tickets.length) {
+        body.innerHTML = '<tr><td colspan="10" style="text-align:center;color:#9ca3af;padding:24px;">No requests yet.</td></tr>';
+        return;
+      }
+      body.innerHTML = tickets.map(t => `
+        <tr>
+          <td>${t.control_no || '—'}</td>
+          <td>${escapeHtml(t.name || '—')}</td>
+          <td>${escapeHtml(t.division || '—')}</td>
+          <td>${escapeHtml(t.dept || '—')}</td>
+          <td>${escapeHtml(t.type)}</td>
+          <td>${escapeHtml(t.priority)}</td>
+          <td>${escapeHtml(t.description)}</td>
+          <td><span class="badge badge-${statusClass(t.status)}">${t.status}</span></td>
+          <td>${new Date(t.created).toLocaleString()}</td>
+          <td style="text-align: center;">
+            <button onclick="deleteTicket('${t.id}')" style="border:none; background:none; color:#dc2626; cursor:pointer; padding:4px;" title="Delete Request">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function deleteTicket(id) {
+      if (!confirm('Are you sure you want to delete this request?')) return;
+      let tickets = loadTickets();
+      tickets = tickets.filter(t => t.id !== id);
+      saveTickets(tickets);
+      renderTickets();
+    }
+
+    function statusClass(s) {
+      if (!s) return 'pending';
+      const l = s.toLowerCase();
+      if (l === 'open') return 'pending';
+      if (l === 'ongoing') return 'ongoing';
+      if (l === 'completed') return 'success';
+      if (l === 'closed') return 'success';
+      return 'pending';
+    }
+
+    function escapeHtml(s) {
+      return (s + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+  </script>
+</body>
+
+</html>
