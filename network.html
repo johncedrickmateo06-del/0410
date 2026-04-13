@@ -92,39 +92,39 @@
         <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
         <!-- Services -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-services-group">
           <button class="dropdown-btn">
             <i class="fas fa-tools"></i> <span>Services</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="services.html">Service Requests</a>
-            <a href="posting.html">Website Posting Logs</a>
+            <a href="services.html" id="nav-service-requests">Service Requests</a>
+            <a href="posting.html" id="nav-website-posting">Website Posting Logs</a>
           </div>
         </div>
 
         <!-- Operations Monitoring -->
-        <div class="sidebar-dropdown open">
+        <div class="sidebar-dropdown open" id="nav-ops-group">
           <button class="dropdown-btn">
             <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="network.html" class="active">Network Monitoring</a>
-            <a href="systems.html">Systems Monitoring</a>
-            <a href="database.html">Database Monitoring</a>
+            <a href="network.html" class="active" id="nav-network">Network Monitoring</a>
+            <a href="systems.html" id="nav-systems">Systems Monitoring</a>
+            <a href="database.html" id="nav-database">Database Monitoring</a>
           </div>
         </div>
 
         <!-- Asset Management -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-assets-group">
           <button class="dropdown-btn">
             <i class="fas fa-boxes"></i> <span>Asset Management</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="assets.html">Hardware Assets</a>
-            <a href="softwareasset.html">Software Assets</a>
+            <a href="assets.html" id="nav-hardware">Hardware Assets</a>
+            <a href="softwareasset.html" id="nav-software">Software Assets</a>
           </div>
         </div>
         <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
@@ -151,6 +151,30 @@
               onclick="exportToCSV('firewall')"><i class="fas fa-file-export"></i> Generate Report</button>
             <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
           </div>
+        </div>
+
+        <!-- Filters -->
+        <div
+          style="padding:12px 20px; display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px; border-bottom:1px solid #e5e7eb;">
+          <div style="position:relative;">
+            <input type="text" id="fwSearch" placeholder="Search by incident or country..." oninput="filterFirewall()"
+              style="width:100%; padding:8px 12px 8px 34px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <i class="fas fa-search"
+              style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:12px;"></i>
+          </div>
+          <select id="fwFilterRep" onchange="filterFirewall()"
+            style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <option value="">All Reputations</option>
+            <option>VirusTotal</option>
+            <option>AbuseIPDB</option>
+          </select>
+          <select id="fwFilterAbuse" onchange="filterFirewall()"
+            style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <option value="">All Abuse Levels</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
         </div>
         <div style="overflow-x:auto;">
           <table id="firewallTable">
@@ -253,6 +277,12 @@
         <div class="section-header">
           <h2><i class="fas fa-wifi" style="margin-right:8px;color:#0d1b6e;"></i>DOE Wi-Fi Speed Tests</h2>
           <div style="display:flex; gap:10px; align-items:center;">
+            <div style="position:relative; width:220px;">
+              <input type="text" id="secSearch-wifi" placeholder="Search location..." oninput="filterWifi()"
+                style="width:100%; padding:4px 12px 4px 30px; border:1px solid #e5e7eb; border-radius:4px; font-size:12px;">
+              <i class="fas fa-search"
+                style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:11px;"></i>
+            </div>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
               onclick="openWifiModal('DOE Wi-Fi')"><i class="fas fa-plus"></i> Add Test</button>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
@@ -286,6 +316,12 @@
           <h2><i class="fas fa-broadcast-tower" style="margin-right:8px;color:#0d1b6e;"></i>Fixed Wireless Speed Tests
           </h2>
           <div style="display:flex; gap:10px; align-items:center;">
+            <div style="position:relative; width:220px;">
+              <input type="text" id="secSearch-fixed" placeholder="Search location..." oninput="filterWifi()"
+                style="width:100%; padding:4px 12px 4px 30px; border:1px solid #e5e7eb; border-radius:4px; font-size:12px;">
+              <i class="fas fa-search"
+                style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:11px;"></i>
+            </div>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
               onclick="openWifiModal('Fixed Wireless')"><i class="fas fa-plus"></i> Add Test</button>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
@@ -318,6 +354,12 @@
         <div class="section-header">
           <h2><i class="fas fa-router" style="margin-right:8px;color:#0d1b6e;"></i>Router Speed Tests</h2>
           <div style="display:flex; gap:10px; align-items:center;">
+            <div style="position:relative; width:220px;">
+              <input type="text" id="secSearch-router" placeholder="Search location..." oninput="filterWifi()"
+                style="width:100%; padding:4px 12px 4px 30px; border:1px solid #e5e7eb; border-radius:4px; font-size:12px;">
+              <i class="fas fa-search"
+                style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:11px;"></i>
+            </div>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
               onclick="openWifiModal('Router')"><i class="fas fa-plus"></i> Add Test</button>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
@@ -350,6 +392,12 @@
         <div class="section-header">
           <h2><i class="fas fa-network-wired" style="margin-right:8px;color:#0d1b6e;"></i>LAN Speed Tests</h2>
           <div style="display:flex; gap:10px; align-items:center;">
+            <div style="position:relative; width:220px;">
+              <input type="text" id="secSearch-lan" placeholder="Search location..." oninput="filterWifi()"
+                style="width:100%; padding:4px 12px 4px 30px; border:1px solid #e5e7eb; border-radius:4px; font-size:12px;">
+              <i class="fas fa-search"
+                style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:11px;"></i>
+            </div>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
               onclick="openWifiModal('LAN')"><i class="fas fa-plus"></i> Add Test</button>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
@@ -533,7 +581,8 @@
             </div>
 
             <div style="margin-top:16px;">
-              <button class="btn" id="btnSaveWifi" onclick="saveWifi()" disabled><i class="fas fa-save"></i> Save</button>
+              <button class="btn" id="btnSaveWifi" onclick="saveWifi()" disabled><i class="fas fa-save"></i>
+                Save</button>
             </div>
           </div>
         </div>
@@ -545,6 +594,12 @@
           <h2><i class="fas fa-clipboard-check" style="margin-right:8px;color:#0d1b6e;"></i>Preventive Maintenance
             Checklist</h2>
           <div style="display:flex; gap:10px; align-items:center;">
+            <div style="position:relative; width:250px;">
+              <input type="text" id="pmSearch" placeholder="Search inspector name..." oninput="filterPm()"
+                style="width:100%; padding:4px 12px 4px 30px; border:1px solid #e5e7eb; border-radius:4px; font-size:12px;">
+              <i class="fas fa-search"
+                style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:11px;"></i>
+            </div>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
               onclick="openPmModal()"><i class="fas fa-plus"></i> Add Checklist</button>
             <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
@@ -628,11 +683,11 @@
       try { return JSON.parse(localStorage.getItem('firewall_logs_v1') || '[]'); } catch (e) { return []; }
     }
 
-    function renderFirewallTable() {
-      const logs = getFirewallLogs();
+    function renderFirewallTable(list = null) {
+      const logs = list || getFirewallLogs();
       const body = document.getElementById('firewallBody');
       if (logs.length === 0) {
-        body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:24px;">No firewall logs recorded yet.</td></tr>';
+        body.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#9ca3af;padding:24px;">No matching records found.</td></tr>';
         return;
       }
       body.innerHTML = logs.map(l => `
@@ -771,22 +826,28 @@
       try { return JSON.parse(localStorage.getItem('wifi_logs_v1') || '[]'); } catch (e) { return []; }
     }
 
-    function renderWifiTable() {
-      const logs = getWifiLogs();
+    function renderWifiTable(list = null) {
+      const allLogs = list || getWifiLogs();
 
       const sections = [
-        { type: 'DOE Wi-Fi', bodyId: 'wifiBody' },
-        { type: 'Fixed Wireless', bodyId: 'fixedBody' },
-        { type: 'Router', bodyId: 'routerBody' },
-        { type: 'LAN', bodyId: 'lanBody' }
+        { type: 'DOE Wi-Fi', bodyId: 'wifiBody', searchId: 'secSearch-wifi' },
+        { type: 'Fixed Wireless', bodyId: 'fixedBody', searchId: 'secSearch-fixed' },
+        { type: 'Router', bodyId: 'routerBody', searchId: 'secSearch-router' },
+        { type: 'LAN', bodyId: 'lanBody', searchId: 'secSearch-lan' }
       ];
 
       sections.forEach(sec => {
         const body = document.getElementById(sec.bodyId);
-        const filtered = logs.filter(l => l.type === sec.type);
+        let filtered = allLogs.filter(l => l.type === sec.type);
+
+        // If we didn't pass a specific list, we apply individual search filters
+        if (list === null) {
+          const sTerm = document.getElementById(sec.searchId).value.toLowerCase();
+          filtered = filtered.filter(l => (l.loc || '').toLowerCase().includes(sTerm) || (l.bldg || '').toLowerCase().includes(sTerm));
+        }
 
         if (filtered.length === 0) {
-          body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">No speed tests recorded yet.</td></tr>';
+          body.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">No speed tests found.</td></tr>';
         } else {
           body.innerHTML = filtered.map(l => `
         <tr>
@@ -957,11 +1018,11 @@
       try { return JSON.parse(localStorage.getItem('pm_logs_v1') || '[]'); } catch (e) { return []; }
     }
 
-    function renderPmTable() {
-      const logs = getPmLogs();
+    function renderPmTable(list = null) {
+      const logs = list || getPmLogs();
       const body = document.getElementById('pmBody');
       if (logs.length === 0) {
-        body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:24px;">No checklist records yet.</td></tr>';
+        body.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#9ca3af;padding:24px;">No checklist records found.</td></tr>';
         return;
       }
       body.innerHTML = logs.map(l => `
@@ -1062,48 +1123,257 @@
       renderPmTable();
     }
 
-    function exportToCSV(type) {
-      let data = [];
-      let filename = 'report.csv';
 
-      if (type === 'firewall') {
-        data = getFirewallLogs();
-        filename = 'firewall_logs.csv';
-      } else if (['DOE Wi-Fi', 'Fixed Wireless', 'Router', 'LAN'].includes(type)) {
-        data = getWifiLogs().filter(l => l.type === type);
-        filename = type.toLowerCase().replace(/ /g, '_') + '_speed_tests.csv';
-      } else if (type === 'pmi') {
-        data = getPmLogs();
-        filename = 'maintenance_checklist.csv';
-      }
+    // ── Shared Report Engine ──────────────────────────────────────────────────
+    function openNetworkReport(title, subtitle, bodyHtml) {
+      const now = new Date().toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' });
+      const header = `<div style="display:flex;align-items:center;gap:18px;border-bottom:3px solid #0d1b6e;padding-bottom:14px;margin-bottom:20px;">
+        <div>
+          <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Department of Energy – Information Technology Division</div>
+          <h1 style="margin:4px 0 2px;font-size:22px;color:#0d1b6e;">${title}</h1>
+          <div style="font-size:12px;color:#374151;">${subtitle}</div>
+        </div>
+        <div style="margin-left:auto;text-align:right;font-size:11px;color:#9ca3af;">Generated: ${now}<br>ITD AOMS</div>
+      </div>`;
 
-      if (data.length === 0) {
-        alert("No data available to export.");
-        return;
-      }
+      const w = window.open('', '_blank');
+      w.document.write(`<!DOCTYPE html><html lang="en"><head>
+        <meta charset="UTF-8">
+        <title>${title} – ITD AOMS</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:'Inter',Arial,sans-serif;font-size:12px;color:#111827;padding:32px 40px;background:#fff}
+          table{width:100%;border-collapse:collapse;margin-top:12px;font-size:11.5px}
+          th{background:#0d1b6e;color:#fff;padding:8px 10px;text-align:left;font-weight:600;}
+          td{padding:7px 10px;border-bottom:1px solid #e5e7eb;color:#374151;}
+          tr:nth-child(even) td{background:#f9fafb}
+          .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+          .badge-high{background:#fee2e2;color:#991b1b;}
+          .badge-medium{background:#fef3c7;color:#92400e;}
+          .badge-low{background:#d1fae5;color:#065f46;}
+          .badge-ok{background:#d1fae5;color:#065f46;}
+          .summary{display:flex;gap:14px;margin:14px 0 20px;flex-wrap:wrap;}
+          .summary-card{border:1px solid #e5e7eb;border-radius:6px;padding:10px 14px;background:#f9fafb;min-width:110px;}
+          .val{font-size:22px;font-weight:800;color:#0d1b6e;} .lbl{font-size:11px;color:#6b7280;}
+          .check{color:#059669;font-weight:700;} .cross{color:#dc2626;font-weight:700;}
+          .section-title{font-size:13px;font-weight:700;color:#0d1b6e;margin:18px 0 6px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;}
+          .val{font-size:22px;font-weight:800;color:#0d1b6e;} .lbl{font-size:11px;color:#6b7280;}
+          .check{color:#059669;font-weight:700;} .cross{color:#dc2626;font-weight:700;}
+          .section-title{font-size:13px;font-weight:700;color:#0d1b6e;margin:18px 0 6px;border-bottom:1px solid #e5e7eb;padding-bottom:4px;}
+          .print-actions{display:flex; justify-content:center; gap:12px; margin-top:24px;}
+          .print-btn{padding:10px 24px; background:#0d1b6e; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;}
+          .export-btn{background:#10b981;}
+          @media print{.no-print, .print-actions{display:none !important;}body{padding:16px;}}
+        </style>
+      </head><body>
+        ${header}
+        ${bodyHtml}
+        <div class="print-actions">
+          <button class="print-btn export-btn" onclick="exportTableToCSV()">📥 Export as CSV</button>
+          <button class="print-btn" onclick="window.print()">🖨 Print Report</button>
+        </div>
+        <script>
+          (function() {
+            const table = document.querySelector('table');
+            if (!table) return;
+            const ths = table.querySelectorAll('th');
+            let filterHtml = '<div class="no-print" style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px; padding:12px; margin-bottom:16px;">';
+            filterHtml += '<h4 style="margin:0 0 8px; font-size:12px; color:#374151;"><i class="fas fa-filter"></i> Select Columns to Include</h4>';
+            filterHtml += '<div style="display:flex; flex-wrap:wrap; gap:14px; font-size:12px;">';
+            ths.forEach((th, i) => {
+              filterHtml += \`<label style="cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" id="col-\${i}" checked onchange="toggleColumn(\${i})" style="accent-color:#0d1b6e;"> \${th.innerText}</label>\`;
+            });
+            filterHtml += '</div></div>';
+            table.insertAdjacentHTML('beforebegin', filterHtml);
+          })();
 
-      const headers = Object.keys(data[0]);
-      const csvRows = [];
-      csvRows.push(headers.join(','));
+          function toggleColumn(index) {
+            const table = document.querySelector('table');
+            if (!table) return;
+            const isChecked = document.getElementById('col-' + index).checked;
+            const ths = table.querySelectorAll('th');
+            if(ths[index]) ths[index].style.display = isChecked ? '' : 'none';
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+              const tds = row.querySelectorAll('td');
+              if(tds[index]) tds[index].style.display = isChecked ? '' : 'none';
+            });
+          }
 
-      for (const row of data) {
-        const values = headers.map(header => {
-          const val = row[header] + '';
-          return '"' + val.replace(/"/g, '""') + '"';
-        });
-        csvRows.push(values.join(','));
-      }
-
-      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.setAttribute('hidden', '');
-      a.setAttribute('href', url);
-      a.setAttribute('download', filename);
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+          function exportTableToCSV() {
+            const table = document.querySelector('table');
+            if (!table) return;
+            let csv = [];
+            const rows = table.querySelectorAll('tr');
+            for (let i = 0; i < rows.length; i++) {
+                let row = [], cols = rows[i].querySelectorAll('td, th');
+                for (let j = 0; j < cols.length; j++) {
+                    if (cols[j].style.display !== 'none') {
+                        let data = cols[j].innerText.replace(/(\\r\\n|\\n|\\r)/gm, ' ').replace(/"/g, '""');
+                        row.push('"' + data + '"');
+                    }
+                }
+                csv.push(row.join(','));
+            }
+            const csvFile = new Blob([csv.join('\\n')], {type: 'text/csv'});
+            const downloadLink = document.createElement('a');
+            let title = document.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'export';
+            downloadLink.download = title + '.csv';
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          }
+        <\/script>
+      </body></html>`);
+      w.document.close();
     }
+
+    function exportToCSV(type) {
+      if (type === 'firewall') {
+        // Read current filter state
+        const searchTerm = document.getElementById('fwSearch').value.toLowerCase();
+        const repFilter = document.getElementById('fwFilterRep').value;
+        const abuseFilter = document.getElementById('fwFilterAbuse').value;
+
+        const all = getFirewallLogs();
+        const data = all.filter(l => {
+          const mSearch = (l.incident || '').toLowerCase().includes(searchTerm) ||
+            (l.country || '').toLowerCase().includes(searchTerm) ||
+            (l.number || '').toLowerCase().includes(searchTerm);
+          return mSearch && (!repFilter || l.reputation === repFilter) && (!abuseFilter || l.abuse === abuseFilter);
+        });
+
+        const filters = [repFilter, abuseFilter].filter(Boolean);
+        const subtitle = filters.length ? 'Filters: ' + filters.join(' | ') : 'All Firewall Incidents';
+
+        const byAbuse = { High: 0, Medium: 0, Low: 0 };
+        data.forEach(l => { if (byAbuse[l.abuse] !== undefined) byAbuse[l.abuse]++; });
+
+        const summary = `<div class="summary">
+          <div class="summary-card"><div class="val">${data.length}</div><div class="lbl">Total Incidents</div></div>
+          <div class="summary-card"><div class="val">${byAbuse.High}</div><div class="lbl">High Abuse</div></div>
+          <div class="summary-card"><div class="val">${byAbuse.Medium}</div><div class="lbl">Medium Abuse</div></div>
+          <div class="summary-card"><div class="val">${byAbuse.Low}</div><div class="lbl">Low Abuse</div></div>
+        </div>`;
+
+        const rows = data.map(l => {
+          const abClass = { high: 'badge-high', medium: 'badge-medium', low: 'badge-low' }[(l.abuse || '').toLowerCase()] || '';
+          return `<tr>
+            <td>${l.date || '—'} ${l.time || ''}</td>
+            <td><strong>${l.number || '—'}</strong></td>
+            <td>${l.incident || '—'}</td>
+            <td>${l.country || '—'}</td>
+            <td>${l.reputation || '—'}</td>
+            <td><span class="badge ${abClass}">${l.abuse || '—'}</span></td>
+            <td>${l.action || '—'}</td>
+            <td>${l.remarks || '—'}</td>
+          </tr>`;
+        }).join('');
+
+        const table = data.length ? `<table>
+          <thead><tr><th>Date &amp; Time</th><th>Incident No.</th><th>Incident/Alert</th><th>Country</th><th>Reputation</th><th>Abuse Level</th><th>Action Taken</th><th>Remarks</th></tr></thead>
+          <tbody>${rows}</tbody></table>` : '<p style="color:#9ca3af;margin-top:16px;">No firewall logs match the selected filters.</p>';
+
+        openNetworkReport('Actioned Firewall Logs Report', subtitle, summary + table);
+
+      } else if (['DOE Wi-Fi', 'Fixed Wireless', 'Router', 'LAN'].includes(type)) {
+        // Map type to search input id
+        const searchIdMap = { 'DOE Wi-Fi': 'secSearch-wifi', 'Fixed Wireless': 'secSearch-fixed', 'Router': 'secSearch-router', 'LAN': 'secSearch-lan' };
+        const searchTerm = (document.getElementById(searchIdMap[type])?.value || '').toLowerCase();
+
+        const all = getWifiLogs().filter(l => l.type === type);
+        const data = searchTerm ? all.filter(l =>
+          (l.loc || '').toLowerCase().includes(searchTerm) || (l.bldg || '').toLowerCase().includes(searchTerm)
+        ) : all;
+
+        const subtitle = searchTerm ? `Filtered by: "${searchTerm}"` : `All ${type} Speed Tests`;
+        const isLAN = type === 'LAN';
+
+        const summary = `<div class="summary">
+          <div class="summary-card"><div class="val">${data.length}</div><div class="lbl">Total Tests</div></div>
+          ${!isLAN ? `
+          <div class="summary-card"><div class="val">${data.length ? (data.reduce((s, l) => s + parseFloat(l.ldl || 0), 0) / data.length).toFixed(1) : '—'}</div><div class="lbl">Avg Laptop DL (Mbps)</div></div>
+          <div class="summary-card"><div class="val">${data.length ? (data.reduce((s, l) => s + parseFloat(l.mdl || 0), 0) / data.length).toFixed(1) : '—'}</div><div class="lbl">Avg Mobile DL (Mbps)</div></div>
+          ` : `
+          <div class="summary-card"><div class="val">${data.length ? (data.reduce((s, l) => s + parseFloat(l.dl || 0), 0) / data.length).toFixed(1) : '—'}</div><div class="lbl">Avg Download (Mbps)</div></div>
+          <div class="summary-card"><div class="val">${data.length ? (data.reduce((s, l) => s + parseFloat(l.ul || 0), 0) / data.length).toFixed(1) : '—'}</div><div class="lbl">Avg Upload (Mbps)</div></div>
+          `}
+        </div>`;
+
+        let rows, thead;
+        if (isLAN) {
+          rows = data.map(l => `<tr>
+            <td>${l.date || '—'} ${l.time || ''}</td>
+            <td><strong>${l.loc || '—'}</strong></td>
+            <td>${l.bldg || '—'}</td>
+            <td>${l.dl || '—'}</td>
+            <td>${l.ul || '—'}</td>
+          </tr>`).join('');
+          thead = '<tr><th>Date &amp; Time</th><th>Location</th><th>Building / Floor</th><th>Download (Mbps)</th><th>Upload (Mbps)</th></tr>';
+        } else {
+          rows = data.map(l => `<tr>
+            <td>${l.date || '—'} ${l.time || ''}</td>
+            <td><strong>${l.loc || '—'}</strong></td>
+            <td>${l.bldg || '—'}</td>
+            <td>${l.ldl || '—'}</td><td>${l.lul || '—'}</td>
+            <td>${l.mdl || '—'}</td><td>${l.mul || '—'}</td>
+            <td>${l.ap || '—'}</td><td>${l.dev || '—'}</td>
+          </tr>`).join('');
+          thead = '<tr><th>Date &amp; Time</th><th>Location</th><th>Building/Floor</th><th>Laptop DL</th><th>Laptop UL</th><th>Mobile DL</th><th>Mobile UL</th><th>AP</th><th>Devices</th></tr>';
+        }
+
+        const table = data.length ? `<table><thead>${thead}</thead><tbody>${rows}</tbody></table>` :
+          '<p style="color:#9ca3af;margin-top:16px;">No speed tests recorded yet.</p>';
+
+        openNetworkReport(`${type} Speed Test Report`, subtitle, summary + table);
+
+      } else if (type === 'pmi') {
+        const searchTerm = (document.getElementById('pmSearch')?.value || '').toLowerCase();
+        const all = getPmLogs();
+        const data = searchTerm ? all.filter(l => (l.inspector || '').toLowerCase().includes(searchTerm)) : all;
+
+        const subtitle = searchTerm ? `Inspector: "${searchTerm}"` : 'All Maintenance Checklists';
+
+        const byInspector = {};
+        data.forEach(l => { byInspector[l.inspector] = (byInspector[l.inspector] || 0) + 1; });
+        const inspCards = Object.entries(byInspector).map(([name, cnt]) =>
+          `<div class="summary-card"><div class="val">${cnt}</div><div class="lbl">${name}</div></div>`
+        ).join('');
+
+        const summary = `<div class="summary">
+          <div class="summary-card"><div class="val">${data.length}</div><div class="lbl">Total Checklists</div></div>
+          ${inspCards}
+        </div>`;
+
+        const yesNo = v => v ? '<span class="check">✔ Yes</span>' : '<span class="cross">✘ No</span>';
+
+        const rows = data.map(l => `<tr>
+          <td>${l.date || '—'}</td>
+          <td><strong>${l.inspector || '—'}</strong></td>
+          <td>${l.temp || '—'}°C</td>
+          <td>${l.humidity || '—'}%</td>
+          <td>${yesNo(l.c2)}</td>
+          <td>${yesNo(l.c3)}</td>
+          <td>${yesNo(l.c4)}</td>
+          <td>${yesNo(l.c5)}</td>
+          <td>${yesNo(l.c6)}</td>
+          <td>${yesNo(l.c7)}</td>
+        </tr>`).join('');
+
+        const table = data.length ? `<table>
+          <thead><tr>
+            <th>Date</th><th>Inspector</th><th>Temp</th><th>Humidity</th>
+            <th>No Dust</th><th>Power Stable</th><th>Switches OK</th><th>Firewall Active</th><th>Screens OK</th><th>Logs Checked</th>
+          </tr></thead>
+          <tbody>${rows}</tbody></table>` : '<p style="color:#9ca3af;margin-top:16px;">No checklist records found.</p>';
+
+        openNetworkReport('Preventive Maintenance Checklist Report', subtitle, summary + table);
+      }
+    }
+
 
     function deletePmLog(id) {
       if (!confirm("Are you sure you want to delete this checklist log?")) return;
@@ -1171,9 +1441,36 @@
       document.getElementById('btnSaveWifi').disabled = !(baseFilled && extraFilled);
     }
 
+    function filterFirewall() {
+      const searchTerm = document.getElementById('fwSearch').value.toLowerCase();
+      const repFilter = document.getElementById('fwFilterRep').value;
+      const abuseFilter = document.getElementById('fwFilterAbuse').value;
+
+      const all = getFirewallLogs();
+      const filtered = all.filter(l => {
+        const matchesSearch = (l.incident || '').toLowerCase().includes(searchTerm) || (l.country || '').toLowerCase().includes(searchTerm) || (l.number || '').toLowerCase().includes(searchTerm);
+        const matchesRep = !repFilter || l.reputation === repFilter;
+        const matchesAbuse = !abuseFilter || l.abuse === abuseFilter;
+        return matchesSearch && matchesRep && matchesAbuse;
+      });
+      renderFirewallTable(filtered);
+    }
+
+    function filterWifi() {
+      renderWifiTable();
+    }
+
+    function filterPm() {
+      const searchTerm = document.getElementById('pmSearch').value.toLowerCase();
+      const all = getPmLogs();
+      const filtered = all.filter(l => (l.inspector || '').toLowerCase().includes(searchTerm));
+      renderPmTable(filtered);
+    }
+
     document.querySelectorAll('#wifiModal input').forEach(inp => {
       inp.addEventListener('input', validateWifiForm);
     });
   </script>
 </body>
+
 </html>
