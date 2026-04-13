@@ -13,21 +13,55 @@
   <link rel="stylesheet" href="style.css">
   <style>
     .modal-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); z-index: 1000;
-      display: flex; align-items: center; justify-content: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
     .modal-content {
-      background: #fff; width: 550px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: flex; flex-direction: column; overflow: hidden;
+      background: #fff;
+      width: 550px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
+
     .modal-header {
-      padding: 16px 20px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: #6b7280; }
-    .close-btn:hover { color: #111827; }
-    .modal-body { padding: 20px; }
-    .modal-overlay.hidden { display: none; }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #6b7280;
+    }
+
+    .close-btn:hover {
+      color: #111827;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
   </style>
 </head>
 
@@ -52,39 +86,39 @@
         <a href="dashboard.html" id="nav-dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a>
 
         <!-- Services -->
-        <div class="sidebar-dropdown open">
+        <div class="sidebar-dropdown open" id="nav-services-group">
           <button class="dropdown-btn">
             <i class="fas fa-tools"></i> <span>Services</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="services.html" class="active">Service Requests</a>
-            <a href="posting.html">Website Posting Logs</a>
+            <a href="services.html" class="active" id="nav-service-requests">Service Requests</a>
+            <a href="posting.html" id="nav-website-posting">Website Posting Logs</a>
           </div>
         </div>
 
         <!-- Operations Monitoring -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-ops-group">
           <button class="dropdown-btn">
             <i class="fas fa-chart-line"></i> <span>Operations Monitoring</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="network.html">Network Monitoring</a>
-            <a href="systems.html">Systems Monitoring</a>
-            <a href="database.html">Database Monitoring</a>
+            <a href="network.html" id="nav-network">Network Monitoring</a>
+            <a href="systems.html" id="nav-systems">Systems Monitoring</a>
+            <a href="database.html" id="nav-database">Database Monitoring</a>
           </div>
         </div>
 
         <!-- Asset Management -->
-        <div class="sidebar-dropdown">
+        <div class="sidebar-dropdown" id="nav-assets-group">
           <button class="dropdown-btn">
             <i class="fas fa-boxes"></i> <span>Asset Management</span>
             <i class="fas fa-chevron-down chevron"></i>
           </button>
           <div class="sidebar-submenu">
-            <a href="assets.html">Hardware Assets</a>
-            <a href="softwareasset.html">Software Assets</a>
+            <a href="assets.html" id="nav-hardware">Hardware Assets</a>
+            <a href="softwareasset.html" id="nav-software">Software Assets</a>
           </div>
         </div>
         <a href="user.html" id="nav-users"><i class="fas fa-user-shield"></i> <span>User Management</span></a>
@@ -104,7 +138,11 @@
       <div class="section-block" style="margin-top:0; margin-bottom:18px;">
         <div class="section-header">
           <h2><i class="fas fa-inbox" style="margin-right:8px;color:#0d1b6e;"></i>Pending Client Requests</h2>
-          <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button id="btnAdminCreate" class="btn" style="padding:6px 12px; font-size:12px; line-height:1;"
+              onclick="openCreateModal()"><i class="fas fa-plus"></i> Create Request</button>
+            <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
+          </div>
         </div>
         <div style="overflow-x:auto;">
           <table id="pendingTable">
@@ -118,7 +156,10 @@
               </tr>
             </thead>
             <tbody id="pendingBody">
-              <tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">All caught up! No pending requests.</td></tr>
+              <tr>
+                <td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">All caught up! No pending
+                  requests.</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -128,96 +169,172 @@
       <div id="processRequestModal" class="modal-overlay hidden">
         <div class="modal-content">
           <div class="modal-header">
-            <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-edit"></i> Process Request #<span id="displayCtrlNo"></span></h3>
+            <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-edit"></i> Process Request #<span
+                id="displayCtrlNo"></span></h3>
             <button class="close-btn" onclick="cancelEdit()">&times;</button>
           </div>
           <div class="modal-body">
 
-        <div class="form-row" style="margin-bottom:14px;">
-          <div class="form-group">
-            <label>Client Name</label>
-            <input type="text" id="fieldName" readonly style="background:#f9fafb; color:#4b5563;">
-          </div>
-          <div class="form-group">
-            <label>Division</label>
-            <input type="text" id="fieldDivision" readonly style="background:#f9fafb; color:#4b5563;">
-          </div>
-          <div class="form-group">
-            <label>Department</label>
-            <input type="text" id="fieldDept" readonly style="background:#f9fafb; color:#4b5563;">
-          </div>
-        </div>
+            <div class="form-row" style="margin-bottom:14px;">
+              <div class="form-group">
+                <label>Client Name</label>
+                <input type="text" id="fieldName" readonly style="background:#f9fafb; color:#4b5563;">
+              </div>
+              <div class="form-group">
+                <label>Division</label>
+                <input type="text" id="fieldDivision" readonly style="background:#f9fafb; color:#4b5563;">
+              </div>
+              <div class="form-group">
+                <label>Department</label>
+                <input type="text" id="fieldDept" readonly style="background:#f9fafb; color:#4b5563;">
+              </div>
+            </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <label>Service Type</label>
-            <select id="serviceName" disabled style="background:#f9fafb; color:#4b5563; appearance:none;">
-              <option value="">Select type...</option>
-              <option>EMAIL</option>
-              <option>ICT INFRASTRUCTURE SYSTEMS</option>
-              <option>INFORMATION SYSTEMS AND DATABASES</option>
-              <option>NETWORK SYSTEMS</option>
-              <option>WORKSTATIONS AND PERIPHERALS </option>
-              <option>USER ACCOUNT CREATION</option>
-              <option>USER ACCOUNT MODIFICATION</option>
-              <option>USER ACCOUNT DEACTIVATION</option>
-              <option>PASSWORD RESETTING</option> 
-            </select>
-          </div>
-          <div class="form-group">
-             <label>Assigned To</label>
-             <input type="text" id="assignedTo" placeholder="Enter personnel name">
-          </div>
-        </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Service Type</label>
+                <select id="serviceName" disabled style="background:#f9fafb; color:#4b5563; appearance:none;">
+                  <option value="">Select type...</option>
+                  <option>EMAIL</option>
+                  <option>ICT INFRASTRUCTURE SYSTEMS</option>
+                  <option>INFORMATION SYSTEMS AND DATABASES</option>
+                  <option>NETWORK SYSTEMS</option>
+                  <option>WORKSTATIONS AND PERIPHERALS </option>
+                  <option>USER ACCOUNT CREATION</option>
+                  <option>USER ACCOUNT MODIFICATION</option>
+                  <option>USER ACCOUNT DEACTIVATION</option>
+                  <option>PASSWORD RESETTING</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Assigned To</label>
+                <input type="text" id="assignedTo" placeholder="Enter personnel name">
+              </div>
+            </div>
 
-        <div class="form-group">
-          <label>Description</label>
-          <input type="text" id="description" readonly style="background:#f9fafb; color:#4b5563;">
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Status</label>
-            <select id="status">
-              <option>Pending</option>
-              <option>Ongoing</option>
-              <option>Completed</option>
-              <option>Closed</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Priority</label>
-            <select id="priority">
-              <option>Low</option>
-              <option>Normal</option>
-              <option>High</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:flex; gap:10px; margin-top:16px;">
-          <button class="btn" id="submitBtn" onclick="transferRecord()"><i class="fas fa-check-circle"></i> Confirm</button>
-        </div>
+            <div class="form-group">
+              <label>Description</label>
+              <input type="text" id="description" readonly style="background:#f9fafb; color:#4b5563;">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Status</label>
+                <select id="status">
+                  <option>Pending</option>
+                  <option>Ongoing</option>
+                  <option>Completed</option>
+                  <option>Closed</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Priority</label>
+                <select id="priority">
+                  <option>Low</option>
+                  <option>Normal</option>
+                  <option>High</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:16px;">
+              <button class="btn" id="submitBtn" onclick="transferRecord()"><i class="fas fa-check-circle"></i>
+                Confirm</button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Ticket Table -->
+
+      <!-- Create Service Request Modal (Admin) -->
+      <div id="createRequestModal" class="modal-overlay hidden">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h3 style="margin:0;font-size:16px;color:#0d1b6e;"><i class="fas fa-plus"></i> Create New Service Request
+            </h3>
+            <button class="close-btn" onclick="closeCreateModal()">&times;</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label>Client Name <span style="color:red;">*</span></label>
+              <input type="text" id="newReqName" list="clientList" placeholder="Search or type client name..." required>
+              <datalist id="clientList"></datalist>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Bureau/Services <span style="color:red;">*</span></label>
+                <select id="newReqDept" onchange="updateCreateDivisionDropdown()">
+                  <option value="">Select Bureau...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Division <span style="color:red;">*</span></label>
+                <select id="newReqDivision">
+                  <option value="">Select Division...</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Service Type <span style="color:red;">*</span></label>
+              <select id="newReqType">
+                <option value="">Select type...</option>
+                <option>EMAIL</option>
+                <option>ICT INFRASTRUCTURE SYSTEMS</option>
+                <option>INFORMATION SYSTEMS AND DATABASES</option>
+                <option>NETWORK SYSTEMS</option>
+                <option>WORKSTATIONS AND PERIPHERALS</option>
+                <option>USER ACCOUNT CREATION</option>
+                <option>USER ACCOUNT MODIFICATION</option>
+                <option>USER ACCOUNT DEACTIVATION</option>
+                <option>PASSWORD RESETTING</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Description / Details <span style="color:red;">*</span></label>
+              <textarea id="newReqDesc" rows="3" placeholder="Enter service request details..."
+                style="width:100%; padding:10px; border:1px solid #e5e7eb; border-radius:6px; font-family:inherit; font-size:13px;"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Initial Priority</label>
+                <select id="newReqPriority">
+                  <option>Normal</option>
+                  <option>Low</option>
+                  <option>High</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Assign To (Optional)</label>
+                <input type="text" id="newReqAssigned" placeholder="Staff Name">
+              </div>
+            </div>
+            <div style="display:flex; gap:10px; margin-top:16px;">
+              <button class="btn" onclick="saveNewRequest()"><i class="fas fa-save"></i> Save Request</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="section-block">
         <div class="section-header">
           <h2><i class="fas fa-list" style="margin-right:8px;color:#0d1b6e;"></i>Service Request Tracking</h2>
           <div style="display:flex; align-items:center; gap:10px;">
-            <button class="btn" style="padding:6px 12px; font-size:12px; line-height:1;"><i class="fas fa-file-export"
-                style="margin-right:5px;"></i> Generate Report</button>
+            <button class="btn" style="padding:6px 12px; font-size:12px; line-height:1;"
+              onclick="generateTrackingReport()"><i class="fas fa-file-export" style="margin-right:5px;"></i> Generate
+              Report</button>
             <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
           </div>
         </div>
 
         <!-- Filters -->
-        <div style="padding:12px 20px;display:grid;grid-template-columns: 2fr 1fr 1fr 1fr;gap:10px;border-bottom:1px solid #e5e7eb;">
+        <div
+          style="padding:12px 20px;display:grid;grid-template-columns: 2fr 1fr 1fr 1fr;gap:10px;border-bottom:1px solid #e5e7eb;">
           <div style="position:relative;">
-            <input type="text" id="trackSearch" placeholder="Search by name or control no..." oninput="filterTrackedTickets()" style="width:100%; padding:8px 12px 8px 34px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
-            <i class="fas fa-search" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:12px;"></i>
+            <input type="text" id="trackSearch" placeholder="Search by name or control no..."
+              oninput="filterTrackedTickets()"
+              style="width:100%; padding:8px 12px 8px 34px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+            <i class="fas fa-search"
+              style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; font-size:12px;"></i>
           </div>
-          <select id="trackType" onchange="filterTrackedTickets()" style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+          <select id="trackType" onchange="filterTrackedTickets()"
+            style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
             <option value="">All Types</option>
             <option>EMAIL</option>
             <option>ICT INFRASTRUCTURE SYSTEMS</option>
@@ -227,13 +344,15 @@
             <option>USER ACCOUNT CREATION</option>
             <option>PASSWORD RESETTING</option>
           </select>
-          <select id="trackStatus" onchange="filterTrackedTickets()" style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+          <select id="trackStatus" onchange="filterTrackedTickets()"
+            style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
             <option value="">All Statuses</option>
             <option>Ongoing</option>
             <option>Completed</option>
             <option>Closed</option>
           </select>
-          <select id="trackPriority" onchange="filterTrackedTickets()" style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
+          <select id="trackPriority" onchange="filterTrackedTickets()"
+            style="padding:8px; border:1px solid #e5e7eb; border-radius:6px; font-size:13px;">
             <option value="">All Priorities</option>
             <option>Low</option>
             <option>Normal</option>
@@ -268,13 +387,16 @@
         <h2>
           <span><i class="fas fa-chart-bar" style="margin-right:8px;color:#0d1b6e;"></i>Service Usage Analytics</span>
           <div style="display:flex; gap:10px; float:right;">
-            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"><i class="fas fa-file-export"></i> Generate Report</button>
+            <button class="btn" style="padding:4px 10px; font-size:12px; font-family: inherit; font-weight:600;"
+              onclick="generateAnalyticsReport()"><i class="fas fa-file-export"></i> Generate Report</button>
             <button class="section-minimize-btn" title="Toggle Section"><i class="fas fa-minus"></i></button>
           </div>
         </h2>
-        <div id="analyticsGrid" style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;margin-top:14px;">
+        <div id="analyticsGrid"
+          style="display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:12px;margin-top:14px;">
         </div>
-        <p style="margin-top:14px;font-size:13px;color:#6b7280; border-top:1px dashed #e5e7eb; padding-top:12px;">Peak Ticket Activity Time: <strong id="peakTime">—</strong></p>
+        <p style="margin-top:14px;font-size:13px;color:#6b7280; border-top:1px dashed #e5e7eb; padding-top:12px;">Peak
+          Ticket Activity Time: <strong id="peakTime">—</strong></p>
       </div>
 
 
@@ -289,6 +411,232 @@
     }
     function saveTickets(t) { localStorage.setItem(ticketStoreKey(), JSON.stringify(t)); }
 
+    // ── Report Helpers ────────────────────────────────────────────────────────
+    function reportHeader(title, subtitle) {
+      const now = new Date().toLocaleString('en-PH', { dateStyle: 'long', timeStyle: 'short' });
+      return `
+        <div style="display:flex;align-items:center;gap:18px;border-bottom:3px solid #0d1b6e;padding-bottom:14px;margin-bottom:20px;">
+          <div>
+            <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;">Department of Energy – Information Technology Division</div>
+            <h1 style="margin:4px 0 2px;font-size:22px;color:#0d1b6e;">${title}</h1>
+            <div style="font-size:12px;color:#374151;">${subtitle}</div>
+          </div>
+          <div style="margin-left:auto;text-align:right;font-size:11px;color:#9ca3af;">
+            Generated: ${now}<br>ITD AOMS
+          </div>
+        </div>`;
+    }
+
+    function openReportWindow(title, subtitle, bodyHtml) {
+      const w = window.open('', '_blank');
+      w.document.write(`<!DOCTYPE html><html lang="en"><head>
+        <meta charset="UTF-8">
+        <title>${title} – ITD AOMS Report</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+        <style>
+          *{box-sizing:border-box;margin:0;padding:0}
+          body{font-family:'Inter',Arial,sans-serif;font-size:12px;color:#111827;padding:32px 40px;background:#fff}
+          table{width:100%;border-collapse:collapse;margin-top:12px;font-size:11.5px}
+          th{background:#0d1b6e;color:#fff;padding:8px 10px;text-align:left;font-weight:600;}
+          td{padding:7px 10px;border-bottom:1px solid #e5e7eb;color:#374151;}
+          tr:nth-child(even) td{background:#f9fafb}
+          .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;}
+          .badge-ongoing{background:#fef3c7;color:#92400e;}
+          .badge-success,.badge-completed,.badge-closed{background:#d1fae5;color:#065f46;}
+          .badge-pending,.badge-open{background:#fee2e2;color:#991b1b;}
+          .summary{display:flex;gap:16px;margin:14px 0 20px;}
+          .summary-card{flex:1;border:1px solid #e5e7eb;border-radius:6px;padding:12px 16px;background:#f9fafb;}
+          .summary-card .val{font-size:24px;font-weight:800;color:#0d1b6e;}
+          .summary-card .lbl{font-size:11px;color:#6b7280;}
+          .print-actions{display:flex; justify-content:center; gap:12px; margin-top:24px;}
+          .print-btn{padding:10px 24px; background:#0d1b6e; color:#fff; border:none; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;}
+          .export-btn{background:#10b981;}
+          @media print{.no-print, .print-actions{display:none !important;}body{padding:16px;}}
+        </style>
+      </head><body>
+        ${reportHeader(title, subtitle)}
+        ${bodyHtml}
+        <div class="print-actions">
+          <button class="print-btn export-btn" onclick="exportTableToCSV()">📥 Export as CSV</button>
+          <button class="print-btn" onclick="window.print()">🖨 Print Report</button>
+        </div>
+        <script>
+          (function() {
+            const table = document.querySelector('table');
+            if (!table) return;
+            const ths = table.querySelectorAll('th');
+            let filterHtml = '<div class="no-print" style="background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px; padding:12px; margin-bottom:16px;">';
+            filterHtml += '<h4 style="margin:0 0 8px; font-size:12px; color:#374151;"><i class="fas fa-filter"></i> Select Columns to Include</h4>';
+            filterHtml += '<div style="display:flex; flex-wrap:wrap; gap:14px; font-size:12px;">';
+            ths.forEach((th, i) => {
+              filterHtml += \`<label style="cursor:pointer; display:inline-flex; align-items:center; gap:4px;"><input type="checkbox" id="col-\${i}" checked onchange="toggleColumn(\${i})" style="accent-color:#0d1b6e;"> \${th.innerText}</label>\`;
+            });
+            filterHtml += '</div></div>';
+            table.insertAdjacentHTML('beforebegin', filterHtml);
+          })();
+
+          function toggleColumn(index) {
+            const table = document.querySelector('table');
+            if (!table) return;
+            const isChecked = document.getElementById('col-' + index).checked;
+            const ths = table.querySelectorAll('th');
+            if(ths[index]) ths[index].style.display = isChecked ? '' : 'none';
+            const rows = table.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+              const tds = row.querySelectorAll('td');
+              if(tds[index]) tds[index].style.display = isChecked ? '' : 'none';
+            });
+          }
+
+          function exportTableToCSV() {
+            const table = document.querySelector('table');
+            if (!table) return;
+            let csv = [];
+            const rows = table.querySelectorAll('tr');
+            for (let i = 0; i < rows.length; i++) {
+                let row = [], cols = rows[i].querySelectorAll('td, th');
+                for (let j = 0; j < cols.length; j++) {
+                    if (cols[j].style.display !== 'none') {
+                        let data = cols[j].innerText.replace(/(\\r\\n|\\n|\\r)/gm, ' ').replace(/"/g, '""');
+                        row.push('"' + data + '"');
+                    }
+                }
+                csv.push(row.join(','));
+            }
+            const csvFile = new Blob([csv.join('\\n')], {type: 'text/csv'});
+            const downloadLink = document.createElement('a');
+            let title = document.title.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'export';
+            downloadLink.download = title + '.csv';
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+          }
+        <\/script>
+      </body></html>`);
+      w.document.close();
+    }
+
+    // ── Service Request Tracking Report ───────────────────────────────────────
+    function generateTrackingReport() {
+      const searchTerm = document.getElementById('trackSearch').value.toLowerCase();
+      const typeFilter = document.getElementById('trackType').value;
+      const statusFilter = document.getElementById('trackStatus').value;
+      const priorityFilter = document.getElementById('trackPriority').value;
+
+      const all = loadTickets();
+      const data = all.filter(t => {
+        const isTracked = t.status && ['ongoing', 'completed', 'closed'].includes(t.status.toLowerCase());
+        if (!isTracked) return false;
+        const matchSearch = (t.name || '').toLowerCase().includes(searchTerm) || (t.control_no || '').toLowerCase().includes(searchTerm);
+        const matchType = !typeFilter || t.type === typeFilter;
+        const matchStatus = !statusFilter || t.status === statusFilter;
+        const matchPri = !priorityFilter || t.priority === priorityFilter;
+        return matchSearch && matchType && matchStatus && matchPri;
+      });
+
+      const filters = [typeFilter, statusFilter, priorityFilter].filter(Boolean);
+      const subtitle = filters.length ? 'Filters: ' + filters.join(' | ') : 'All Processed Requests';
+
+      const byStatus = { Ongoing: 0, Completed: 0, Closed: 0 };
+      data.forEach(t => { if (byStatus[t.status] !== undefined) byStatus[t.status]++; });
+
+      const summary = `<div class="summary">
+        <div class="summary-card"><div class="val">${data.length}</div><div class="lbl">Total Records</div></div>
+        <div class="summary-card"><div class="val">${byStatus.Ongoing}</div><div class="lbl">Ongoing</div></div>
+        <div class="summary-card"><div class="val">${byStatus.Completed}</div><div class="lbl">Completed</div></div>
+        <div class="summary-card"><div class="val">${byStatus.Closed}</div><div class="lbl">Closed</div></div>
+      </div>`;
+
+      const rows = data.map(t => {
+        const bClass = { ongoing: 'badge-ongoing', completed: 'badge-success', closed: 'badge-closed' }[t.status.toLowerCase()] || '';
+        return `<tr>
+          <td><strong>${t.control_no || '—'}</strong></td>
+          <td>${(t.name || '—')}</td>
+          <td>${(t.dept || '—')}</td>
+          <td>${(t.division || '—')}</td>
+          <td>${(t.type || '—')}</td>
+          <td>${(t.assignedTo || 'Unassigned')}</td>
+          <td><span class="badge ${bClass}">${t.status}</span></td>
+          <td>${(t.priority || 'Normal')}</td>
+          <td>${t.created ? new Date(t.created).toLocaleDateString() : '—'}</td>
+        </tr>`;
+      }).join('');
+
+      const table = data.length ? `<table>
+        <thead><tr><th>Control No.</th><th>Client Name</th><th>Bureau</th><th>Division</th><th>Service Type</th><th>Assigned To</th><th>Status</th><th>Priority</th><th>Date</th></tr></thead>
+        <tbody>${rows}</tbody></table>` : '<p style="color:#9ca3af;margin-top:16px;">No records match the selected filters.</p>';
+
+      openReportWindow('Service Request Tracking Report', subtitle, summary + table);
+    }
+
+    // ── Service Analytics Report ───────────────────────────────────────────────
+    function generateAnalyticsReport() {
+      const all = loadTickets();
+      const counts = {};
+      let hours = {};
+      all.forEach(r => {
+        if (!r.type) return;
+        counts[r.type] = (counts[r.type] || 0) + 1;
+        if (r.created) { let h = new Date(r.created).getHours(); hours[h] = (hours[h] || 0) + 1; }
+      });
+      let peak = Object.keys(hours).reduce((a, b) => hours[a] > hours[b] ? a : b, 0);
+      const peakStr = (hours[peak] && peak) ? `${peak}:00 – ${(parseInt(peak) + 1) % 24}:00` : '—';
+
+      const byStatus = { Open: 0, Pending: 0, Ongoing: 0, Completed: 0, Closed: 0 };
+      all.forEach(t => { const s = (t.status || 'Open'); if (byStatus[s] !== undefined) byStatus[s]++; });
+
+      const summary = `<div class="summary">
+        <div class="summary-card"><div class="val">${all.length}</div><div class="lbl">Total Requests</div></div>
+        <div class="summary-card"><div class="val">${byStatus.Open + byStatus.Pending}</div><div class="lbl">Pending</div></div>
+        <div class="summary-card"><div class="val">${byStatus.Ongoing}</div><div class="lbl">Ongoing</div></div>
+        <div class="summary-card"><div class="val">${byStatus.Completed + byStatus.Closed}</div><div class="lbl">Resolved</div></div>
+      </div>`;
+
+      const rows = Object.entries(counts).sort((a, b) => b[1] - a[1]).map(([type, count]) =>
+        `<tr><td>${type}</td><td><strong>${count}</strong></td><td>${Math.round(count / Math.max(all.length, 1) * 100)}%</td></tr>`
+      ).join('');
+
+      const table = `<table>
+        <thead><tr><th>Service Type</th><th>Request Count</th><th>Share (%)</th></tr></thead>
+        <tbody>${rows}</tbody></table>
+        <p style="margin-top:14px;font-size:12px;color:#6b7280;">Peak Activity Hour: <strong>${peakStr}</strong></p>`;
+
+      openReportWindow('Service Usage Analytics Report', 'All-time service usage breakdown', summary + table);
+    }
+
+    const ORGANIZATIONAL_DATA = {
+      "AS": ["AS", "AS-GSD", "AS-HRMD", "AS-OD", "AS-PMD", "AS-TD"],
+      "EPIMB": ["EPIMB", "EPIMB-EMPDD", "EPIMB-OD", "EPIMB-PMDD", "EPIMB-PPDD"],
+      "EPPB": ["EPPB", "EPPB-ECCD", "EPPB-OD", "EPPB-PD", "EPPB-PFRD"],
+      "ERDB": ["ERDB", "ERDB-CNMD", "ERDB-OD", "ERDB-PRDD"],
+      "ERTLS": ["ERTLS", "ERTLS-GRFTLD", "ERTLS-LATD", "ERTLS-OD"],
+      "EUMB": ["EUMB", "EUMB-AFETD", "EUMB-EMPDD", "EUMB-EPRED", "EUMB-EPSMD", "EUMB-EVIMD", "EUMB-NED", "EUMB-OD"],
+      "FS": ["FS", "FS-AD", "FS-BD", "FS-CERCD", "FS-OD", "FS-PCD", "FS-RERCD"],
+      "ITMS": ["ITMS", "ITMS-IDMD", "ITMS-ISD", "ITMS-ITD", "ITMS-OD"],
+      "LFO": ["LFO", "LFO-EPIMD", "LFO-ERDD", "LFO-EUMD", "LFO-OD", "LFO-OIMD"],
+      "LS": ["LS", "LS-DCELSD", "LS-GLSD", "LS-OD", "LS-PLSD", "LS-RELSD", "LS-UCELSD"],
+      "MFO": ["MFO", "MFO-EPIMD", "MFO-ERDD", "MFO-EUMD", "MFO-OD", "MFO-OIMD"],
+      "OIMB": ["OIMB", "OIMB-NGMD", "OIMB-OD", "OIMB-OICMD", "OIMB-OISMD", "OIMB-RMMSCD"],
+      "OSEC": ["OSEC", "OSEC-ACAN", "OSEC-AOS", "OSEC-CWPO", "OSEC-FWBF", "OSEC-GCJB", "OSEC-IAD", "OSEC-IPO", "OSEC-MCC", "OSEC-MCM", "OSEC-MFFR", "OSEC-PAO", "OSEC-RCLG", "OSEC-RVC"],
+      "REMB": ["REMB", "REMB-BEMD", "REMB-GEMD", "REMB-HOEMD", "REMB-NREB-TSMD", "REMB-OD", "REMB-SEMD", "REMB-TSMD", "REMB-WEMD"],
+      "VFO": ["VFO", "VFO-EIMD", "VFO-EPIMD", "VFO-ERDD", "VFO-ERDUD", "VFO-EUMD", "VFO-OD", "VFO-OIMD"]
+    };
+
+    function updateCreateDivisionDropdown() {
+      const deptVal = document.getElementById('newReqDept').value;
+      const divSelect = document.getElementById('newReqDivision');
+      divSelect.innerHTML = '<option value="">Select Division...</option>';
+      if (deptVal && ORGANIZATIONAL_DATA[deptVal]) {
+        ORGANIZATIONAL_DATA[deptVal].forEach(div => {
+          const opt = document.createElement('option');
+          opt.value = opt.textContent = div;
+          divSelect.appendChild(opt);
+        });
+      }
+    }
+
     let editingTicketId = null;
 
     function renderTables(list = null) {
@@ -298,7 +646,7 @@
 
       // Pending: Always show actual pending, independent of tracking filter
       const pending = (list ? loadTickets() : tickets).filter(t => !t.status || t.status.toLowerCase() === 'open' || t.status.toLowerCase() === 'pending');
-      
+
       // Tracked: use the passed list (which might be filtered)
       const tracked = tickets.filter(t => t.status && (t.status.toLowerCase() === 'ongoing' || t.status.toLowerCase() === 'completed' || t.status.toLowerCase() === 'closed'));
 
@@ -348,7 +696,7 @@
           </tr>`;
         }).join('');
       }
-      
+
       updateAnalytics(tickets);
     }
 
@@ -359,7 +707,7 @@
       const priorityFilter = document.getElementById('trackPriority').value;
 
       const allTickets = loadTickets();
-      
+
       // We only filter the "TRACKED" tickets. "PENDING" remains static in its own list.
       const filtered = allTickets.filter(t => {
         const isTracked = t.status && (t.status.toLowerCase() === 'ongoing' || t.status.toLowerCase() === 'completed' || t.status.toLowerCase() === 'closed');
@@ -377,7 +725,7 @@
       // but to keep it simple, we'll just modify renderTables to take the tracked portion
       const fullList = loadTickets();
       const pendingList = fullList.filter(t => !t.status || t.status.toLowerCase() === 'open' || t.status.toLowerCase() === 'pending');
-      
+
       // Combine back for renderTables logic
       renderTables([...pendingList, ...filtered]);
     }
@@ -386,9 +734,9 @@
       const tickets = loadTickets();
       const t = tickets.find(x => x.id === id);
       if (!t) return;
-      
+
       editingTicketId = id;
-      
+
       document.getElementById('displayCtrlNo').textContent = t.control_no || id;
       document.getElementById('fieldName').value = t.name || '';
       document.getElementById('fieldDivision').value = t.division || '';
@@ -396,30 +744,30 @@
       document.getElementById('serviceName').value = t.type || '';
       document.getElementById('assignedTo').value = t.assignedTo || '';
       document.getElementById('description').value = t.description || '';
-      
+
       // Default to 'Ongoing' when reviewing a newly submitted or pending request
       const statRaw = t.status.toLowerCase();
       const stat = (statRaw === 'open' || statRaw === 'pending') ? 'Ongoing' : t.status;
       document.getElementById('status').value = stat || 'Ongoing';
       document.getElementById('priority').value = t.priority || 'Normal';
-      
+
       document.getElementById('processRequestModal').classList.remove('hidden');
     }
 
     function transferRecord() {
       if (!editingTicketId) return;
       if (!confirm("Are you sure you want to confirm this request processing?")) return;
-      
+
       const tickets = loadTickets();
       const idx = tickets.findIndex(x => x.id === editingTicketId);
       if (idx === -1) return;
-      
+
       tickets[idx].status = document.getElementById('status').value;
       tickets[idx].priority = document.getElementById('priority').value;
       tickets[idx].assignedTo = document.getElementById('assignedTo').value.trim();
-      
+
       saveTickets(tickets);
-      
+
       cancelEdit();
       renderTables();
     }
@@ -428,6 +776,75 @@
       editingTicketId = null;
       document.getElementById('processRequestModal').classList.add('hidden');
       document.getElementById('assignedTo').value = '';
+    }
+
+    // --- Admin Create Logic ---
+    function openCreateModal() {
+      // Populate Datalist from user accounts
+      const userList = JSON.parse(localStorage.getItem('users_v1') || '[]');
+      const datalist = document.getElementById('clientList');
+      datalist.innerHTML = userList.map(u => `<option value="${escapeHtml(u.name)}">`).join('');
+
+      // Populate Dept dropdown
+      const deptSelect = document.getElementById('newReqDept');
+      deptSelect.innerHTML = '<option value="">Select Bureau...</option>';
+      Object.keys(ORGANIZATIONAL_DATA).sort().forEach(dept => {
+        const opt = document.createElement('option');
+        opt.value = opt.textContent = dept;
+        deptSelect.appendChild(opt);
+      });
+      document.getElementById('newReqDivision').innerHTML = '<option value="">Select Division...</option>';
+
+      document.getElementById('newReqName').value = '';
+      document.getElementById('newReqType').value = '';
+      document.getElementById('newReqDesc').value = '';
+      document.getElementById('newReqPriority').value = 'Normal';
+      document.getElementById('newReqAssigned').value = '';
+
+      document.getElementById('createRequestModal').classList.remove('hidden');
+    }
+
+    function closeCreateModal() {
+      document.getElementById('createRequestModal').classList.add('hidden');
+    }
+
+    function saveNewRequest() {
+      const name = document.getElementById('newReqName').value.trim();
+      const type = document.getElementById('newReqType').value;
+      const dept = document.getElementById('newReqDept').value;
+      const div = document.getElementById('newReqDivision').value;
+      const desc = document.getElementById('newReqDesc').value.trim();
+      const priority = document.getElementById('newReqPriority').value;
+      const assigned = document.getElementById('newReqAssigned').value.trim();
+
+      if (!name || !type || !desc || !dept || !div) {
+        alert("Please fill in all required fields (Client Name, Bureau, Division, Service Type, and Description).");
+        return;
+      }
+
+      const tickets = loadTickets();
+      const id = 'TKT-' + Date.now();
+      const count = tickets.length + 1;
+      const ctrlNo = `SR-${new Date().getFullYear()}-${String(count).padStart(4, '0')}`;
+
+      const newTicket = {
+        id: id,
+        control_no: ctrlNo,
+        name: name,
+        type: type,
+        dept: dept,
+        division: div,
+        description: desc,
+        priority: priority,
+        assignedTo: assigned,
+        status: assigned ? 'Ongoing' : 'Pending',
+        created: new Date().toISOString()
+      };
+
+      tickets.unshift(newTicket);
+      saveTickets(tickets);
+      closeCreateModal();
+      renderTables();
     }
 
     function deleteTicket(id) {
@@ -446,14 +863,14 @@
       if (!tickets) tickets = loadTickets();
       const counts = {};
       let hours = {};
-      
+
       tickets.forEach(r => {
         if (!r.type) return;
         counts[r.type] = (counts[r.type] || 0) + 1;
-        
+
         if (r.created) { let h = new Date(r.created).getHours(); hours[h] = (hours[h] || 0) + 1; }
       });
-      
+
       const container = document.getElementById('analyticsGrid');
       if (container) {
         if (Object.keys(counts).length === 0) {
@@ -467,7 +884,7 @@
           `).join('');
         }
       }
-      
+
       let peak = Object.keys(hours).reduce((a, b) => hours[a] > hours[b] ? a : b, 0);
       document.getElementById("peakTime").innerText = (hours[peak] && peak) ? peak + ":00" : "—";
     }
@@ -476,11 +893,13 @@
 
 
 
-    // RBAC: Hide User Management for non-admins
+    // RBAC: Hide User Management for non-admins, and Create Request button
     const userRole = localStorage.getItem('role');
     if (userRole !== 'Admin') {
       const navUsers = document.getElementById('nav-users');
       if (navUsers) navUsers.style.display = 'none';
+      const btnAdminCreate = document.getElementById('btnAdminCreate');
+      if (btnAdminCreate) btnAdminCreate.style.display = 'none';
     }
 
     // Section Toggling
@@ -510,6 +929,8 @@
       });
     });
   </script>
+  <script src="sidebar-rbac.js"></script>
+  <script>applySidebarRBAC('service_requests');</script>
 </body>
 
 </html>
